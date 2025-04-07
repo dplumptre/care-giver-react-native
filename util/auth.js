@@ -3,7 +3,7 @@ import axios from 'axios';
 import { urlA,urlI } from '../constant/konst';
 
 export async function createUser({fullName,username,email,password}){
-   const response = await axios.post(`${urlA}/auth/signup}`,
+   const response = await axios.post(`${urlA}/auth/signup`,
         {
             name:fullName,
             username:username,

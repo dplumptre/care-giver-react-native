@@ -1,8 +1,15 @@
 import { StyleSheet, View, Text, Pressable, Platform } from "react-native";
 import IconButton from "../buttons/IconButton";
 
-const LearningVideoItem = (props) => (
-  <Pressable 
+
+
+
+const LearningVideoItem = (props) => {
+
+
+
+  
+  return (<Pressable 
     android_ripple={{ color: '#E0E0E0' }} 
     style={({ pressed }) => [
       styles.listItemContainer,
@@ -20,7 +27,7 @@ const LearningVideoItem = (props) => (
       <IconButton name="chevron-forward-sharp" size={24} color="#DDD" />
     </Text>
   </Pressable>
-);
+)};
 
 export default LearningVideoItem;
 
