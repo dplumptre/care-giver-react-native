@@ -91,8 +91,9 @@ const SignupScreen = ({ navigation }) => {
 
 
     try {
+      console.log('payload',payload);
       const response = await createUser(payload);
-      console.log('After createUser');
+    
       console.log('Response:', response.data);
       console.log("Signup success:", response.data.message + " Please Signin");
 
