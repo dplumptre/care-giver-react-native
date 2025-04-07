@@ -48,7 +48,9 @@ function MainDashboardNavigator({ navigation }) {
             name="menu"
             color="#522E2E"
             size={23}
-            drawer
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
           />
           
           )
@@ -77,7 +79,9 @@ function LearningHubNavigator({ navigation }) {
             name="menu"
             color="#522E2E"
             size={23}
-            drawer
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
           />
           
           )
@@ -123,7 +127,7 @@ const DrawerNavigator=()=>{
         options={{
           title:'Dashboard',
           drawerIcon:({color,size}) =>(
-            <Ionicons name="stats-chart" size={size} color={color} />
+            <Ionicons name="stats-chart" size={size} color={color}  />
           )
         }}
     />
