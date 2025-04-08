@@ -1,7 +1,7 @@
 import { View, Text, TextInput, StyleSheet, Platform, TouchableOpacity, Alert } from 'react-native';
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import FlatButton from "../../components/buttons/FlatButton";
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { createUser } from '../../util/auth';

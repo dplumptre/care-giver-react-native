@@ -1,12 +1,14 @@
-import { View, Text, TextInput, StyleSheet, Platform, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, Platform, TouchableOpacity, Alert } from 'react-native';
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import FlatButton from "../../components/buttons/FlatButton";
 import { useContext, useState } from "react";
 import { signinUser } from "../../util/auth";
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
 import { authContext } from '../../store/auth-context';
+import { Ionicons } from '@expo/vector-icons';
 
 const SigninScreen = ({ navigation }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const isLogin = true;
   const [isLoading, setIsLoading] = useState(false);
   const authCtx = useContext(authContext);
@@ -104,12 +106,21 @@ const SigninScreen = ({ navigation }) => {
       />
 
       <Text style={[styles.inputLabel, validationErrors.password && styles.errorLabel]}>Password:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => onChangeText('password', text)}
-        value={payload.password}
-        secureTextEntry
-      />
+      <View style={styles.passwordInputContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          onChangeText={(text) => onChangeText('password', text)}
+          value={payload.password}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="gray" />
+        </TouchableOpacity>
+      </View>
+
+
+
+
 
       <View style={styles.buttonContainer}>
         <FlatButton position="right" onPress={onResetHandler}>
@@ -160,6 +171,28 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 5,
+  },
+
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 40,
+    marginBottom: 20,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    elevation: 4,
+    backgroundColor: 'white',
+    shadowColor: 'black',
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    overflow: Platform.OS === 'android' ? 'hidden' : 'visible',
+  },
+  passwordInput: {
+    flex: 1,
+    height: '100%',
   },
 });
 

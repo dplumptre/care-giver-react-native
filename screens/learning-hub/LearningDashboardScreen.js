@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import LearningVideoItem from "../../components/learning/LearningVideoItem";
 import IconButton from "../../components/buttons/IconButton";
@@ -6,8 +6,6 @@ import axios from "axios";
 import { urlA } from "../../constant/konst";
 import { authContext } from "../../store/auth-context";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
-
-
 
 const LearningDashboardScreen =({navigation})=>{
 
@@ -40,6 +38,7 @@ const LearningDashboardScreen =({navigation})=>{
 
     function onViewHandler(id){
         console.log(id);
+        Alert.alert(id);
         navigation.navigate('LearningVideoDetail',{videoId:id})
     }
 
@@ -62,7 +61,7 @@ const LearningDashboardScreen =({navigation})=>{
                 </View>
                 <View >
                 <Text style={styles.statusTextScore}>2/10</Text>
-                <Text style={styles.statusText}>Level</Text>
+                <Text style={styles.statusText}>Level </Text>
                 </View>
 
             </View>
