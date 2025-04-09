@@ -1,5 +1,23 @@
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+
+const PORT = 2125;
+
+const getBaseUrl = () => {
+  const debuggerHost = Constants?.manifest?.debuggerHost || Constants?.expoConfig?.hostUri;
 
 
-// export const urlA = 'http://10.0.2.2:2125/api';
-//export const urlA = 'http://127.0.0.1:2125/api';
-export const urlA = 'http://192.168.1.110:2125/api';
+
+  if (debuggerHost) {
+    const ip = debuggerHost.split(':')[0];
+    console.log(`http://${ip}:${PORT}/api`);
+    return `http://${ip}:${PORT}/api`;
+  }
+
+  // Emulator fallback
+  const localhost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+  console.log(`http://${localhost}:${PORT}/api`);
+  return `http://${localhost}:${PORT}/api`;
+};
+
+export const urlA = getBaseUrl();
