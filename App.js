@@ -105,6 +105,14 @@ const DrawerNavigator = () => {
         )
       }}
     />
+        <Drawer.Screen name='LearningHub' component={LearningDashboardScreen}
+      options={{
+        title: 'Learning Hub',
+        drawerIcon: ({ color, size }) => (
+          <Ionicons name="school" size={size} color={color} />
+        )
+      }}
+    />
     <Drawer.Screen name='Settings' component={SettingsScreen}
       options={{
         title: "Settings",
