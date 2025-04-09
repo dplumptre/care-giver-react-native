@@ -36,10 +36,11 @@ const LearningDashboardScreen =({navigation})=>{
     },[]);
 
 
-    function onViewHandler(id){
+
+
+        function onViewHandlerNow(id){
         console.log(id);
-        Alert.alert(id);
-        navigation.navigate('LearningVideoDetail',{videoId:id})
+       navigation.navigate('LearningVideoDetail',{videoId:id})
     }
 
     if (isLoading) {
@@ -71,9 +72,13 @@ const LearningDashboardScreen =({navigation})=>{
     <View >
         <FlatList data={videoList} renderItem={itemData => {
           return(
-              <LearningVideoItem text={itemData.item.title} id={itemData.item.id} onView={onViewHandler}/>
+              <LearningVideoItem text={itemData.item.title} id={itemData.item.id} onView={onViewHandlerNow}/>
           );
-        }} keyExtractor={(item,index)=> {return item.id;}} alwaysBounceHorizontal={false} />
+        }} 
+        keyExtractor={(item,index)=> {return item.id;}} 
+        alwaysBounceHorizontal={false} 
+        scrollEnabled={true}  
+        />
       </View>
 
         </View>

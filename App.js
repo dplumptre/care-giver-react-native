@@ -69,6 +69,11 @@ function MainDashboardNavigator() {
         component={LearningResultScreen}
         options={{ title: 'Result' }}
       />
+      <Stack.Screen
+        name="SettingsPage"
+        component={SettingsScreen}
+        options={{ title: 'Settings' }}
+      />
     </Stack.Navigator>
   );
 }

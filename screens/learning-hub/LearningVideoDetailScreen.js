@@ -16,6 +16,11 @@ const LearningVideoDetailScreen = () => {
   const authCtx = useContext(authContext);
   const [webViewError, setWebViewError] = useState(null);
 
+
+  function pressButton(){
+    Alert.alert("testing"," this thing is an issue");
+  }
+
   useEffect(() => {
     async function getDetail() {
       try {
@@ -103,7 +108,7 @@ const LearningVideoDetailScreen = () => {
       <View style={styles.content}>
         <Text style={styles.title}>Description:</Text>
         <Text style={styles.description}>{video?.description}</Text>
-        <PrimaryButton onPress={() => Alert.alert("Quiz", "Start Quiz functionality not implemented yet.")}>
+        <PrimaryButton onPress={pressButton}>
           Start Quiz
         </PrimaryButton>
       </View>

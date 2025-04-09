@@ -1,8 +1,11 @@
-import { View, Text, TextInput, StyleSheet, Platform } from "react-native";
+import { View, Text, TextInput, StyleSheet, Platform ,Alert} from "react-native";
+import PrimaryButton from "../components/buttons/PrimaryButton";
 
 const SettingsScreen = ({ navigation }) => {
 
-
+  function pressButton(){
+    Alert.alert("testing"," this thing is an issue");
+  }
 
 
   return (
@@ -11,6 +14,7 @@ const SettingsScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <Text>Settings</Text>
+        <PrimaryButton onPress={pressButton} >click me</PrimaryButton>
       </View>
     </View>
   );

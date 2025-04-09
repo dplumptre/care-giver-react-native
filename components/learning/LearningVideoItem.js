@@ -1,25 +1,47 @@
 import { StyleSheet, View, Text, Pressable, Platform } from "react-native";
 import IconButton from "../buttons/IconButton";
 
-const LearningVideoItem = (props) => (
+
+
+
+
+
+
+const LearningVideoItem = ({id,text,onView}) => (
+
+
+<View>
+
   <Pressable 
+    pointerEvents="box-only"
     android_ripple={{ color: '#E0E0E0' }} 
     style={({ pressed }) => [
       styles.listItemContainer,
       Platform.OS === 'ios' && pressed ? styles.pressedItem : null
     ]}
-    onPress={props.onView.bind(this, props.id)}
+    onPress={()=>onView(id) }
   >
-    <Text style={styles.text1}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+    <View style={styles.text1}>
       <IconButton name="logo-youtube" size={23} color='#C57575' />
-    </Text>
-    <View style={styles.textWrapper}>
-      <Text style={styles.text2}>{props.text}</Text>
     </View>
-    <Text style={styles.text3}>
+    <View style={styles.textWrapper}>
+      <Text style={styles.text2}>{text}</Text>
+    </View>
+    <View style={styles.text3}>
       <IconButton name="chevron-forward-sharp" size={24} color="#DDD" />
-    </Text>
+    </View>
+  </View>
   </Pressable>
+
+
+
+
+</View>
+
+
+
+
 );
 
 export default LearningVideoItem;
@@ -31,7 +53,8 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 8,
     borderRadius: 8, 
-    backgroundColor: '#ffffff',
+    // backgroundColor: '#ffffff',
+
 
 
     borderWidth: 1,
