@@ -3,14 +3,18 @@ import Constants from 'expo-constants';
 
 const PORT = 2125;
 
-// Get local IP of your machine (update this if your IP changes)
-const localIP = '192.168.1.110';
+const getBaseUrl = () => {
+  // 1. If debuggerHost exists, grab IP from it (works for both LAN and Tunnel)
+  const debuggerHost = Constants?.manifest?.debuggerHost || Constants?.expoConfig?.hostUri;
+  const ip = debuggerHost?.split(':')[0];
 
-// Choose host based on platform
-const localhost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+  if (Constants.appOwnership === 'expo' && ip) {
+    return `http://${ip}:${PORT}/api`;
+  }
 
-// Smart base URL decision
-export const urlA =
-  Constants.appOwnership === 'expo'
-    ? `http://${localIP}:${PORT}/api` // running via Expo Go on real device
-    : `http://${localhost}:${PORT}/api`; // running in emulator/simulator
+  // 2. Fallback for emulators
+  const localhost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+  return `http://${localhost}:${PORT}/api`;
+};
+
+export const urlA = getBaseUrl();
