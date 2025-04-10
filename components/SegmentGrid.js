@@ -72,7 +72,7 @@ const styles= StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.05)', // Light grey on press (for iOS)
       },
     title:{
-        fontSize: 12,
+        fontSize: 15,
         marginTop:10,
 
     }

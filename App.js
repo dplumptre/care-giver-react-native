@@ -36,6 +36,7 @@ function MainDashboardNavigator({ navigation }) {
       screenOptions={{
         headerStyle: { backgroundColor: '#FFF' },
         headerTintColor: '#522E2E',
+        headerShown: true,
       }}
     >
       <Stack.Screen
@@ -73,6 +74,7 @@ function LearningHubNavigator({ navigation }) {
         name="LearningDashboard"
         component={LearningDashboardScreen}
         options={{
+          headerShown: true,
           title: 'Learning Hub',
           headerLeft: () => (
             <IconButton

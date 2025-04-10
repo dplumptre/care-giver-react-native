@@ -48,9 +48,11 @@ const LearningDashboardScreen =({navigation})=>{
       }
 
     return (
-        <View style={styles.container}>
+       
 
-            <View style={styles.status}>
+
+      <View style={styles.container}>
+      <View style={styles.status}>
                 <View style={styles.icon}>
                     <Text>
                         <IconButton name="bicycle" size={40} color="#FDE6D0" />
@@ -67,17 +69,26 @@ const LearningDashboardScreen =({navigation})=>{
 
             </View>
 
+  <FlatList
+    data={videoList}
+    renderItem={itemData => (
+      <LearningVideoItem
+        text={itemData.item.title}
+        id={itemData.item.id}
+        onView={onViewHandler}
+      />
+    )}
+    keyExtractor={(item) => item.id}
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ paddingBottom: 16 }}
+    style={{ flex: 1 }}
+  />
+</View>
 
 
-    <View >
-        <FlatList data={videoList} renderItem={itemData => {
-          return(
-              <LearningVideoItem text={itemData.item.title} id={itemData.item.id} onView={onViewHandler}/>
-          );
-        }} keyExtractor={(item,index)=> {return item.id;}} alwaysBounceHorizontal={false} />
-      </View>
 
-        </View>
+
+
 
     )
 }

@@ -9,7 +9,7 @@ import { WebView } from 'react-native-webview';
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 
 
-const LearningVideoDetailScreen = () => {
+const LearningVideoDetailScreen = ({navigation}) => {
   const route = useRoute();
   const { videoId } = route.params;
   const [video, setVideo] = useState(null);
@@ -28,6 +28,9 @@ const LearningVideoDetailScreen = () => {
         const vee = response.data.data;
         console.log("Fetched video details:", vee);
         setVideo(vee);
+        navigation.setOptions({
+            title: vee.title
+        })
       } catch (error) {
         console.error("Error fetching video details:", error);
         Alert.alert(
@@ -41,7 +44,11 @@ const LearningVideoDetailScreen = () => {
     if (videoId) {
       getDetail();
     }
-  }, [videoId, authCtx.token]);
+  }, [videoId, authCtx.token,navigation]);
+
+
+
+
 
   const handleWebViewError = (event) => {
     console.error("WebView Error:", event.nativeEvent);
@@ -67,12 +74,17 @@ const LearningVideoDetailScreen = () => {
     console.log("WebView loaded successfully.");
   };
 
+
+  const goToQuiz =() =>{
+        navigation.navigate('LearningVideoQuestions');
+  }
+
+
   return (
     <View style={styles.container}>
       <View style={styles.videoContainer}>
         {video?.link ? (
           <>
-           
             <WebView
               source={{
                 uri: `https://test.overallheuristic.com/video.html?videoId=${video.link}`,
@@ -101,9 +113,9 @@ const LearningVideoDetailScreen = () => {
         )}
       </View>
       <View style={styles.content}>
-        <Text style={styles.title}>Description:</Text>
+       <Text style={styles.title}>{video?.title}</Text>
         <Text style={styles.description}>{video?.description}</Text>
-        <PrimaryButton onPress={() => Alert.alert("Quiz", "Start Quiz functionality not implemented yet.")}>
+        <PrimaryButton onPress={goToQuiz}>
           Start Quiz
         </PrimaryButton>
       </View>
