@@ -69,7 +69,7 @@ const DashboardScreen = () => {
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
                         <IconButton name="medal-outline" size={15} color="#FFD700" />
-                        <Text style={styles.statusTextWhite}> Medal Earned: </Text>
+                        <Text style={styles.statusTextWhite}> Earned: </Text>
                         <Text style={styles.statusTextDark}> 50 </Text>
                     </View>
                 </View>
@@ -84,7 +84,7 @@ const DashboardScreen = () => {
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
                         <IconButton name="medal-outline" size={15} color="#FFD700" />
-                        <Text style={styles.statusTextWhite}> Medal Earned: </Text>
+                        <Text style={styles.statusTextWhite}> Earned: </Text>
                         <Text style={styles.statusTextDark}> 50 </Text>
                     </View>
                 </View>
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
         padding:10,
         borderRadius:6,
         margin:12,
+        fontSize: 18,
   
 
     },
@@ -150,13 +151,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',  
-        paddingVertical: 5, 
     },
     statusItemDown:{
 
         flexDirection: 'row',
         alignItems: 'center', 
-        paddingVertical: 5, 
     },
     statusItem: {
         flexDirection: 'row',
@@ -165,14 +164,13 @@ const styles = StyleSheet.create({
 
 
     statusTextWhite: {
-        fontSize: 13,
-        fontWeight: 'bold',
+     
+        paddingVertical: 5,
         color: '#FFFFFF',  
     },
     statusTextDark: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        color: '#2D1E1E', 
+        paddingVertical: 5,
+        color: '#000', 
     },
     segments: { flex: 6 },
     mainContainer: {
