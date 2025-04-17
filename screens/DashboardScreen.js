@@ -2,14 +2,20 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import {SEGMENTS} from '../data/dummy';
 import SegmentGrid from '../components/SegmentGrid';
 import IconButton from '../components/buttons/IconButton';
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { authContext } from "../store/auth-context";
 import axios from "axios";
 import { urlA } from "../constant/konst";
+import { useFocusEffect } from "@react-navigation/native";
 
 const DashboardScreen = () => {
 
     const [name,setName] = useState('');
+    const [result,setResult]= useState({
+        "currentLevel": 0,
+        "reward": "Unranked",
+        "levels": 0
+      })
 
 
 
@@ -28,7 +34,29 @@ const DashboardScreen = () => {
         .catch((error) => {
           console.log("Error fetching user:", error.response?.data || error.message);
         });
-      }, []);
+      }, [authCtx.token]);
+
+
+
+
+      useFocusEffect(
+        useCallback(() => {
+          axios.get(`${urlA}/learning-hub-progress/user/result`, {
+            headers: {
+              Authorization: 'Bearer ' + authCtx.token,
+            },
+          })
+          .then((response) => {
+            setResult(response.data.data);
+            console.log(response.data.data);
+          })
+          .catch((error) => {
+            console.log("Error fetching result:", error.response?.data || error.message);
+          });
+        }, [authCtx.token])
+      );
+
+
 
     function renderSegmentItem(itemData) {
         return <SegmentGrid
@@ -63,7 +91,7 @@ const DashboardScreen = () => {
                     <View style={styles.statusItem}>
                         <IconButton name="school" size={15} color="#FDE6D0" /> 
                         <Text style={styles.statusTextWhite}> Learning Hub:</Text>
-                        <Text style={styles.statusTextDark}> Bronze Level</Text>
+                        <Text style={styles.statusTextDark}> {result.reward ? `${result.reward} Badge` : "Loading..."} </Text>
                     </View>
 
                     {/* Group Medal Earned and Number */}
@@ -171,6 +199,7 @@ const styles = StyleSheet.create({
     statusTextDark: {
         paddingVertical: 5,
         color: '#000', 
+         fontWeight: 'bold'
     },
     segments: { flex: 6 },
     mainContainer: {
