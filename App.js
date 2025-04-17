@@ -123,6 +123,7 @@ const DrawerNavigator=()=>{
     headerShown: false,
     gestureEnabled: true, 
     swipeEdgeWidth: 100, 
+    headerTitleAlign: 'center',
   
 }}>
        <Drawer.Screen name='Dashboard' component={MainDashboardNavigator} 

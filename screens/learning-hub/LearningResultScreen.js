@@ -3,15 +3,49 @@ import PrimaryButton from "../../components/buttons/PrimaryButton";
 import IconButton from "../../components/buttons/IconButton";
 
 
-const LearningResultScreen =()=>{
+const LearningResultScreen =({route, navigation})=>{
 
-    return (<View style={styles.container}>
-      <IconButton name='gift' color='#B8860B' size={80} />
-<Text style={styles.congrats}>Congratulations</Text>
-<Text style={styles.content}>You had a perfect score, you can move to the next video</Text>
-<PrimaryButton>Back to  Learning Hub</PrimaryButton>
-</View>
-)
+    const {score,isSuccessful} = route.params;
+
+
+    const onRedirect =()=>{
+        navigation.navigate('LearningDashboard');
+    }
+
+    if(isSuccessful){
+
+        return (<View style={styles.container}>
+            <IconButton name='gift' color='#B8860B' size={80} />
+      <Text style={styles.congrats}>Congratulations</Text>
+      <Text style={styles.content}>You had a perfect score, you can move to the next video</Text>
+      <PrimaryButton onPress={onRedirect}>Back to  Learning Hub</PrimaryButton>
+      </View>
+      )
+
+    }
+
+    return (
+        <View style={styles.container}>
+          <IconButton name='sad' color='#B8860B' size={80} />
+          <Text style={styles.congrats}>Keep Going!</Text>
+      
+          {score >= 0.75 ? (
+            <Text style={styles.content}>
+               You scored {Math.round(score * 100)}%. So close! Review the video and try again to earn your badge.
+            </Text>
+          ) : score >= 0.5 ? (
+            <Text style={styles.content}>
+              You scored {Math.round(score * 100)}%. You're about halfway there! Go through the video once more and give it another shot.
+            </Text>
+          ) : (
+            <Text style={styles.content}>
+               You scored {Math.round(score * 100)}%.Don't give up! Rewatch the video and try again to improve your score.
+            </Text>
+          )}
+      
+      <PrimaryButton onPress={onRedirect}>Back to Learning Hub</PrimaryButton>
+        </View>
+      );
 
 }
 
@@ -27,6 +61,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center',
         marginHorizontal:12,
+       
     },
     congrats:{
         fontSize:30,
@@ -36,5 +71,6 @@ const styles = StyleSheet.create({
     },
     content:{
         marginVertical:20,   
+        fontSize:16
     }
   });
