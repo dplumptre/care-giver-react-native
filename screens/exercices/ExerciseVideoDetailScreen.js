@@ -22,6 +22,8 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
 
     const authCtx = useContext(authContext);
 
+    const isCarerExercise = video?.videoType !== "CARER_EXERCISE";
+
     useEffect(() => {
         async function fetchVideoDetails() {
             try {
@@ -61,7 +63,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
     useEffect(() => {
         setPayload((prev) => ({
             ...prev,
-            careGiver: video?.videoType !== "CARER_EXERCISE",
+            careGiver: isCarerExercise,
         }));
     }, [video?.videoType]);
 
@@ -171,7 +173,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
                         <Text style={{ color: 'red', marginTop: 4 }}>Please select a patient</Text>
                     )}
 
-            {video?.videoType !== "CARER_EXERCISE" && (
+        {isCarerExercise && (
                 <>
                     <Picker
                         selectedValue={payload.patientId}
