@@ -1,11 +1,12 @@
 import { Text, View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import LearningVideoItem from "../../components/learning/LearningVideoItem";
 import IconButton from "../../components/buttons/IconButton";
 import axios from "axios";
 import { urlA } from "../../constant/konst";
 import { authContext } from "../../store/auth-context";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 
@@ -14,6 +15,11 @@ const LearningDashboardScreen =({navigation})=>{
     const [videoList,setVideo] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const authCtx = useContext(authContext);
+    const [result,setResult]= useState({
+        "currentLevel": 0,
+        "reward": "Unranked",
+        "levels": 0
+      })
 
 
     useEffect(()=>{
@@ -38,6 +44,25 @@ const LearningDashboardScreen =({navigation})=>{
     },[]);
 
 
+    useFocusEffect(
+        useCallback(() => {
+          axios.get(`${urlA}/learning-hub-progress/user/result`, {
+            headers: {
+              Authorization: 'Bearer ' + authCtx.token,
+            },
+          })
+          .then((response) => {
+            setResult(response.data.data);
+            console.log(response.data.data);
+          })
+          .catch((error) => {
+            console.log("Error fetching result:", error.response?.data || error.message);
+          });
+        }, [authCtx.token])
+      );
+
+
+
     function onViewHandler(id){
         console.log(id);
         navigation.navigate('LearningVideoDetail',{videoId:id})
@@ -48,36 +73,47 @@ const LearningDashboardScreen =({navigation})=>{
       }
 
     return (
-        <View style={styles.container}>
+       
 
-            <View style={styles.status}>
+
+      <View style={styles.container}>
+      <View style={styles.status}>
                 <View style={styles.icon}>
                     <Text>
-                        <IconButton name="bicycle" size={40} color="#FDE6D0" />
+                        <IconButton name="school" size={40} color="#FDE6D0" />
                     </Text>
                 </View>
                 <View style={styles.level}>
-                <Text style={styles.statusTextMiddle}>Current Grade</Text>
-                <Text style={styles.statusTextMiddle}>Beginner 101</Text>
+                <Text style={styles.statusTextMiddle}>Current Badge</Text>
+                <Text style={styles.statusTextMiddle}>{ result.reward ? `${result.reward}` : "Loading..."}</Text>
                 </View>
                 <View >
-                <Text style={styles.statusTextScore}>2/10</Text>
+                <Text style={styles.statusTextScore}>{result.reward ? `${result.currentLevel}/ ${result.levels}` : "Loading..."}</Text>
                 <Text style={styles.statusText}>Level</Text>
                 </View>
 
             </View>
 
+  <FlatList
+    data={videoList}
+    renderItem={itemData => (
+      <LearningVideoItem
+        text={itemData.item.title}
+        id={itemData.item.id}
+        onView={onViewHandler}
+      />
+    )}
+    keyExtractor={(item) => item.id}
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ paddingBottom: 16 }}
+    style={{ flex: 1 }}
+  />
+</View>
 
 
-    <View >
-        <FlatList data={videoList} renderItem={itemData => {
-          return(
-              <LearningVideoItem text={itemData.item.title} id={itemData.item.id} onView={onViewHandler}/>
-          );
-        }} keyExtractor={(item,index)=> {return item.id;}} alwaysBounceHorizontal={false} />
-      </View>
 
-        </View>
+
+
 
     )
 }

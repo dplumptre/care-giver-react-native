@@ -61,7 +61,7 @@ const ResetScreen = ({ navigation }) => {
       />
 
       <View style={styles.buttonContainer}>
-        <PrimaryButton onPress={onSubmit}>Reset Password</PrimaryButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Reset Password</PrimaryButton>
       </View>
 
       <View style={styles.buttonContainer}>

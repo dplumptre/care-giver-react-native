@@ -1,43 +1,52 @@
 import { Text, View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
+import axios from "axios";
+import { useRoute } from "@react-navigation/native";
+import { authContext } from "../../store/auth-context";
+import { urlA } from "../../constant/konst";
+import LoadingOverlay from "../../components/ui/LoadingOverlay";
 
-// Sample Question Data
-const questions = [
-    {
-        id: "1",
-        question: "What is the main cause of stroke?",
-        options: [
-            { id: "1", text: "High Blood Pressure", isCorrect: true },
-            { id: "2", text: "Lack of Sleep", isCorrect: false },
-            { id: "3", text: "Eating Fruits", isCorrect: false },
-            { id: "4", text: "Drinking Water", isCorrect: false }
-        ]
-    },
-    {
-        id: "2",
-        question: "Which part of the brain is affected by a stroke?",
-        options: [
-            { id: "1", text: "Heart", isCorrect: false },
-            { id: "2", text: "Lungs", isCorrect: false },
-            { id: "3", text: "Brain", isCorrect: true },
-            { id: "4", text: "Kidneys", isCorrect: false }
-        ]
-    },
-    {
-        id: "3",
-        question: "What do you need to do in the morning?",
-        options: [
-            { id: "1", text: "Pray", isCorrect: false },
-            { id: "2", text: "Eat", isCorrect: false },
-            { id: "3", text: "Brush", isCorrect: true },
-            { id: "4", text: "Kiss", isCorrect: false }
-        ]
-    }
-];
+const LearningVideoQuestionsScreen = ({ navigation }) => {
+    const [selectedAnswers, setSelectedAnswers] = useState({});
+    const route = useRoute();
+    const { videoId, title } = route.params;
+    const authCtx = useContext(authContext);
+    const [questions, setQuestions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-const LearningVideoQuestionsScreen = () => {
-    const [selectedAnswers, setSelectedAnswers] = useState({}); 
+    useEffect(() => {
+
+
+        navigation.setOptions({
+            title: title
+        })
+        setIsLoading(true);
+        async function getQuestions() {
+            try {
+                const response = await axios.get(`${urlA}/questions/video/${videoId}`, {
+                    headers: {
+                        Authorization: "Bearer " + authCtx.token,
+                    },
+                });
+                const res = response.data.data;
+                setQuestions(res);
+            } catch (error) {
+                console.error("Error fetching questions", error);
+                Alert.alert(
+                    "Error",
+                    "Failed to load video details. Please try again later.",
+                    [{ text: "OK" }]
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        getQuestions();
+    }, [videoId, authCtx.token]);
+
+
+
 
     const handleSelect = (questionId, optionId) => {
         setSelectedAnswers((prev) => ({
@@ -46,15 +55,97 @@ const LearningVideoQuestionsScreen = () => {
         }));
     };
 
+
+    const allQuestionsAnswered = questions.length > 0 && questions.every((question) => selectedAnswers[question.id]);
+
+    const calculateScore = () => {
+        let correctCount = 0;
+
+        questions.forEach((question) => {
+            const selectedOptionId = selectedAnswers[question.id];
+            const correctOption = question.answerOptionList.find(opt => opt.isCorrect);
+            if (selectedOptionId === correctOption?.id) {
+                correctCount += 1;
+            }
+        });
+        const totalQuestions = questions.length;
+        const scorePercentage = (correctCount / totalQuestions);
+
+        return {
+            correctCount,
+            totalQuestions,
+            scorePercentage
+        };
+    };
+
+
+
+
+    const onSubmit = async () => {
+        setIsLoading(true);
+        const result = calculateScore();
+
+        const isSuccessful = result.correctCount === result.totalQuestions;
+
+        if (isSuccessful) {
+            try {
+                const resp = await axios.post(
+                    `${urlA}/learning-hub-progress/user`,
+                    {
+                        isSuccessful: isSuccessful,
+                        score: result.scorePercentage, 
+                        videoId: videoId,
+                    },
+                    {
+                        headers: {
+                            Authorization: "Bearer " + authCtx.token,
+                        },
+                    }
+                );
+                const data = resp.data;
+                console.log("Progress saved:", data);
+
+                // Navigate or show a result modal
+                // navigation.navigate("SuccessScreen", { score: result.scorePercentage });
+            } catch (error) {
+                console.error("Failed to submit progress:", error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        setIsLoading(false);
+        console.log("User selected:", selectedAnswers);
+        console.log(`Score: ${result.correctCount} out of ${result.totalQuestions}`);
+        console.log(`Percentage: ${result.scorePercentage * 100}%`);
+        navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: "LearningResult",
+                params: {
+                  score: result.scorePercentage,
+                  isSuccessful: isSuccessful,
+                },
+              },
+            ],
+          });
+          
+    }
+
+
+    if (isLoading) {
+        return <LoadingOverlay message="loading questions..." />;
+    }
+
     return (
         <View style={styles.container}>
             <FlatList
                 data={questions}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.questionContainer}>
                         <Text style={styles.question}>{item.question}</Text>
-                        {item.options.map((option) => (
+                        {item.answerOptionList.map((option) => (
                             <TouchableOpacity
                                 key={option.id}
                                 style={[
@@ -69,7 +160,7 @@ const LearningVideoQuestionsScreen = () => {
                                         selectedAnswers[item.id] === option.id ? styles.selectedOptionText : null
                                     ]}
                                 >
-                                    {option.text}
+                                    {option.answerOption}
                                 </Text>
                             </TouchableOpacity>
                         ))}
@@ -77,38 +168,40 @@ const LearningVideoQuestionsScreen = () => {
                 )}
             />
 
-            <PrimaryButton title="Submit Answers" onPress={() => console.log("User selected:", selectedAnswers)} >Submit</PrimaryButton>
+            <PrimaryButton
+                onPress={onSubmit}
+                disabled={!allQuestionsAnswered}
+                style={[!allQuestionsAnswered ? styles.blurredButton : null]}
+            >
+                Submit Answers
+            </PrimaryButton>
         </View>
     );
 };
-
-export default LearningVideoQuestionsScreen;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
         padding: 16,
-        marginTop: 100,
-        marginHorizontal:12,
     },
     questionContainer: {
         marginBottom: 20,
     },
     question: {
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: "bold",
         marginBottom: 10,
         color: "#333",
     },
     option: {
-        padding: 15,
+        padding: 12,
         borderRadius: 8,
         backgroundColor: "#f0f0f0",
         marginBottom: 10,
     },
     optionText: {
-        fontSize: 16,
+        fontSize: 14,
         color: "#333",
     },
     selectedOption: {
@@ -118,4 +211,9 @@ const styles = StyleSheet.create({
         color: "white",
         fontWeight: "bold",
     },
+    blurredButton: {
+        opacity: 0.5, // Apply blur effect by reducing opacity
+    },
 });
+
+export default LearningVideoQuestionsScreen;

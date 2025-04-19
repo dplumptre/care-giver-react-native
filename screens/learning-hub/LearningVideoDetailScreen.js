@@ -1,7 +1,7 @@
 import React, { Text, View, StyleSheet, Button, Alert } from "react-native";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
-import { useRoute } from "@react-navigation/native";
-import { useContext, useEffect, useState } from "react";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { useCallback, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { urlA } from "../../constant/konst";
 import { authContext } from "../../store/auth-context";
@@ -9,12 +9,13 @@ import { WebView } from 'react-native-webview';
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 
 
-const LearningVideoDetailScreen = () => {
+const LearningVideoDetailScreen = ({navigation}) => {
   const route = useRoute();
   const { videoId } = route.params;
   const [video, setVideo] = useState(null);
   const authCtx = useContext(authContext);
   const [webViewError, setWebViewError] = useState(null);
+  const [videoStatus,setVideoStatus] = useState(false);
 
   useEffect(() => {
     async function getDetail() {
@@ -28,6 +29,9 @@ const LearningVideoDetailScreen = () => {
         const vee = response.data.data;
         console.log("Fetched video details:", vee);
         setVideo(vee);
+        navigation.setOptions({
+            title: vee.title
+        })
       } catch (error) {
         console.error("Error fetching video details:", error);
         Alert.alert(
@@ -41,7 +45,29 @@ const LearningVideoDetailScreen = () => {
     if (videoId) {
       getDetail();
     }
-  }, [videoId, authCtx.token]);
+  }, [videoId, authCtx.token,navigation]);
+
+
+
+   
+  useFocusEffect(
+    useCallback(() => {
+      axios.get(`${urlA}/learning-hub-progress/user/learner-hub-quiz-status/${videoId}`, {
+        headers: {
+          Authorization: 'Bearer ' + authCtx.token,
+        },
+      })
+      .then((response) => {
+        setVideoStatus(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch((error) => {
+        console.log("Error fetching video status", error.response?.data || error.message);
+      });
+    }, [authCtx.token])
+  );
+
+
 
   const handleWebViewError = (event) => {
     console.error("WebView Error:", event.nativeEvent);
@@ -67,12 +93,17 @@ const LearningVideoDetailScreen = () => {
     console.log("WebView loaded successfully.");
   };
 
+
+  const goToQuiz =() =>{
+        navigation.navigate('LearningVideoQuestions',{videoId:videoId,title:video.title})
+  }
+
+
   return (
     <View style={styles.container}>
       <View style={styles.videoContainer}>
         {video?.link ? (
           <>
-           
             <WebView
               source={{
                 uri: `https://test.overallheuristic.com/video.html?videoId=${video.link}`,
@@ -101,11 +132,20 @@ const LearningVideoDetailScreen = () => {
         )}
       </View>
       <View style={styles.content}>
-        <Text style={styles.title}>Description:</Text>
+       <Text style={styles.title}>{video?.title}</Text>
         <Text style={styles.description}>{video?.description}</Text>
-        <PrimaryButton onPress={() => Alert.alert("Quiz", "Start Quiz functionality not implemented yet.")}>
-          Start Quiz
-        </PrimaryButton>
+
+        {videoStatus === true ? (
+  <View style={styles.quizCompletedBox}>
+    <Text style={styles.quizCompletedText}>🎉 You’ve passed this quiz!</Text>
+  </View>
+) : (
+  <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={goToQuiz}>
+    Start Quiz
+  </PrimaryButton>
+)}
+
+
       </View>
     </View>
   );
@@ -152,5 +192,18 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     marginBottom: 5,
+  },quizCompletedBox: {
+    backgroundColor: '#d1f7c4',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
   },
+  
+  quizCompletedText: {
+    color: '#2e7d32',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  
 });

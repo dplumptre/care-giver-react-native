@@ -3,14 +3,12 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useNavigation } from "@react-navigation/native";
 
 
-function SegmentGrid({id,title,icon,color,screen}) {
+function SegmentGrid({id,title,icon,color,redirect}) {
 
 const navigation = useNavigation();
 
 
-   const redirect =()=>{
-     navigation.navigate(screen)
-   }
+
 
 
     return(
@@ -72,7 +70,7 @@ const styles= StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.05)', // Light grey on press (for iOS)
       },
     title:{
-        fontSize: 12,
+        fontSize: 15,
         marginTop:10,
 
     }
