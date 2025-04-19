@@ -25,6 +25,7 @@ import EditPatientScreen from './screens/patient/EditPatientScreen';
 import ExerciseDashboardScreen from './screens/exercices/ExerciseDashboardScreen';
 import ExerciseListScreen from './screens/exercices/ExerciseListScreen';
 import ExerciseVideoDetailScreen from './screens/exercices/ExerciseVideoDetailScreen';
+import ExerciseResultScreen from './screens/exercices/ExerciseResultScreen';
 
 
 
@@ -142,11 +143,15 @@ function ExerciseNavigator({ navigation }) {
             name="menu"
             color="#522E2E"
             size={23}
-            drawer
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
           />
-          
+        
           )
         }}
+
+
       />
         <Stack.Screen
         name="ExerciseList"
@@ -157,6 +162,11 @@ function ExerciseNavigator({ navigation }) {
         name="ExerciseVideoDetail"
         component={ExerciseVideoDetailScreen}
         options={{ title: 'Exercises' }}
+      />
+      <Stack.Screen
+        name="ExerciseResult"
+        component={ExerciseResultScreen}
+        options={{ title: 'Result' }}
       />
     </Stack.Navigator>
   );
@@ -181,7 +191,9 @@ function PatientNavigator({ navigation }) {
             name="menu"
             color="#522E2E"
             size={23}
-            drawer
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
           />
           
           )

@@ -22,7 +22,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
 
     const authCtx = useContext(authContext);
 
-    const isCarerExercise = video?.videoType !== "CARER_EXERCISE";
+    const isCarerExercise = video?.videoType === "CARER_EXERCISE";
 
     useEffect(() => {
         async function fetchVideoDetails() {
@@ -61,10 +61,15 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
     }, [authCtx.token]);
 
     useEffect(() => {
-        setPayload((prev) => ({
-            ...prev,
-            careGiver: isCarerExercise,
-        }));
+        if (video?.videoType) {
+            const isCarerExercise = video.videoType === "CARER_EXERCISE";
+            console.log("Video Type:", video.videoType); // Debugging log
+            console.log("isCarerExercise:", isCarerExercise); // Debugging log
+            setPayload((prev) => ({
+                ...prev,
+                careGiver: isCarerExercise,
+            }));
+        }
     }, [video?.videoType]);
 
     const onChangeText = (key, value) => {
@@ -90,47 +95,77 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
         console.log("WebView loaded successfully.");
     };
 
+
     const onSubmit = async () => {
         const { patientId, videoId, careGiver } = payload;
 
-        if (video?.videoType !== "CARER_EXERCISE" && !patientId) {
+        console.log("Payload:", payload);
+    
+        if (!isCarerExercise && !patientId) {
             setValidationError(true);
             return;
         }
-
-        console.log(patientId, videoId, careGiver);
+    
         Alert.alert("Confirm", "Mark this exercise as completed?", [
             { text: "Cancel", style: "cancel" },
             {
                 text: "Yes",
                 onPress: async () => {
                     try {
+                        // Mark exercise as completed
                         await axios.post(
-                          `${urlA}/exercise-session/complete${patientId ? `?patientId=${patientId}` : ''}`, 
-                          {
-                            videoId,
-                            careGiver
-                          }, 
-                          {
-                            headers: {
-                              Authorization: "Bearer " + authCtx.token
-                            }
-                          }
+                            `${urlA}/exercise-session/complete${patientId ? `?patientId=${patientId}` : ''}`,
+                            { videoId, careGiver },
+                            { headers: { Authorization: "Bearer " + authCtx.token } }
                         );
-                      
-                        Alert.alert("Success", "Exercise marked as completed.", [
-                          {
-                            text: "OK",
-                            onPress: () => navigation.navigate("Dashboard")
-                          }
-                        ]);
-                      } catch (error) {
-                        console.error("Submission failed:", error?.response?.data || error);
-                        Alert.alert("Error", "Failed to mark as completed.", [{ text: "OK" }]);
-                      }
-                      
-                }
-            }
+    
+                        // Fetch exercise result
+                        const resultResponse = await axios.get(`${urlA}/exercise-session/result`, {
+                            headers: { Authorization: "Bearer " + authCtx.token },
+                        });
+    
+                        const resultData = resultResponse.data.data;
+    
+                        // Navigate to ExerciseResult screen with result data
+                        navigation.reset({
+                            index: 0,
+                            routes: [
+                                {
+                                    name: "ExerciseResult",
+                                    params: {
+                                        patientStars: resultData.patientStars,
+                                        carerStars: resultData.carerStars,
+                                        patientStreaks: resultData.patientStreaks,
+                                        carerStreaks: resultData.carerStreaks,
+                                    },
+                                },
+                            ],
+                        });
+
+
+                        navigation.reset({
+                            index: 0,
+                            routes: [
+                                {
+                                    name: "ExerciseResult",
+                                    params: {
+                                        patientStars: resultData.patientStars,
+                                        carerStars: resultData.carerStars,
+                                        patientStreaks: resultData.patientStreaks,
+                                        carerStreaks: resultData.carerStreaks,
+                                    },
+                                },
+                            ],
+                        });
+
+
+
+                    } catch (error) {
+                        console.error("Error during submission or fetching result:", error?.response?.data || error);
+                        Alert.alert("Error", "Failed to complete exercise or fetch result.", [{ text: "OK" }]);
+                    }
+                },
+            },
         ]);
     };
 
@@ -173,7 +208,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
                         <Text style={{ color: 'red', marginTop: 4 }}>Please select a patient</Text>
                     )}
 
-        {isCarerExercise && (
+        {!isCarerExercise && (
                 <>
                     <Picker
                         selectedValue={payload.patientId}
