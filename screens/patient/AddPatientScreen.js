@@ -1,11 +1,20 @@
-import { View, Text, TextInput, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform, Alert } from 'react-native';
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import FlatButton from "../../components/buttons/FlatButton";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Picker } from '@react-native-picker/picker'; 
+import { authContext } from '../../store/auth-context';
+import axios from 'axios';
+import { urlA } from '../../constant/konst';
+import { AffectedSide } from '../../util/enum';
 
-const AddPatient = ({ navigation }) => {
+const AddPatientScreen = ({ navigation }) => {
+  
   const isLogin = false;
+
+  const authCtx = useContext(authContext);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const [payload, setPayload] = useState({
     fullName: '',
@@ -26,7 +35,7 @@ const AddPatient = ({ navigation }) => {
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const { fullName, phone, address, affectedSide } = payload;
   
     let isValid = true;
@@ -61,7 +70,45 @@ const AddPatient = ({ navigation }) => {
   
 
     console.log('Form Data Submitted:', payload);
-  };
+      setIsLoading(true);
+
+          try {
+              const resp = await axios.post(
+                  `${urlA}/patients`,
+                  {
+                    name:payload.fullName,
+                    phone:payload.phone,
+                    address:payload.address,
+                    affectedSide:payload.affectedSide,
+                  },
+                  {
+                      headers: {
+                          Authorization: "Bearer " + authCtx.token,
+                      },
+                  }
+              );
+              const data = resp.data;
+              console.log("patient created:", data);
+              Alert.alert(
+                "Patient Created",
+                "You have successfully created a patient",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => navigation.navigate("PatientDasboard")
+                  }
+                ]
+              );
+          } catch (error) {
+              console.error("Failed to create patient:", error.message);
+          } finally {
+              setIsLoading(false);
+          }
+      };
+     
+    
+    
+  
 
   const onFlipHandler = () => {
     if (!isLogin) {
@@ -105,22 +152,15 @@ const AddPatient = ({ navigation }) => {
       >
 
 
-
         <Picker.Item label="Select affected side" value="" />
-        <Picker.Item label="Right" value="right" />
-        <Picker.Item label="Left" value="left" />
-        <Picker.Item label="Both sides" value="both" />
-        <Picker.Item label="None / Not Applicable" value="none" />
+        <Picker.Item label="Right" value={AffectedSide.RIGHT_SIDE} />
+        <Picker.Item label="Left"  value={AffectedSide.LEFT_SIDE} />
+        <Picker.Item label="Both sides" value={AffectedSide.BOTH} />
+        <Picker.Item label="Others"  value={AffectedSide.OTHERS} />
       </Picker>
 
       <View style={styles.buttonContainer}>
-        <PrimaryButton onPress={onSubmit}>Sign up</PrimaryButton>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <FlatButton onPress={onFlipHandler}>
-          {isLogin ? 'Haven’t registered? Create a new user' : 'Already Registered? Log in'}
-        </FlatButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Submit</PrimaryButton>
       </View>
     </View>
   );
@@ -167,7 +207,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddPatient;
+export default AddPatientScreen;
 
 
 

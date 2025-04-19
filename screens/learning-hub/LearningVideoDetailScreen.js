@@ -140,7 +140,7 @@ const LearningVideoDetailScreen = ({navigation}) => {
     <Text style={styles.quizCompletedText}>🎉 You’ve passed this quiz!</Text>
   </View>
 ) : (
-  <PrimaryButton onPress={goToQuiz}>
+  <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={goToQuiz}>
     Start Quiz
   </PrimaryButton>
 )}
