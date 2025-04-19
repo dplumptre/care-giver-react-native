@@ -18,7 +18,7 @@ const LearningResultScreen =({route, navigation})=>{
             <IconButton name='gift' color='#B8860B' size={80} />
       <Text style={styles.congrats}>Congratulations</Text>
       <Text style={styles.content}>You had a perfect score, you can move to the next video</Text>
-      <PrimaryButton onPress={onRedirect}>Back to  Learning Hub</PrimaryButton>
+      <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onRedirect}>Back to  Learning Hub</PrimaryButton>
       </View>
       )
 
@@ -43,7 +43,7 @@ const LearningResultScreen =({route, navigation})=>{
             </Text>
           )}
       
-      <PrimaryButton onPress={onRedirect}>Back to Learning Hub</PrimaryButton>
+      <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onRedirect}>Back to Learning Hub</PrimaryButton>
         </View>
       );
 

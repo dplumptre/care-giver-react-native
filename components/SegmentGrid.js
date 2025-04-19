@@ -3,14 +3,12 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useNavigation } from "@react-navigation/native";
 
 
-function SegmentGrid({id,title,icon,color,screen}) {
+function SegmentGrid({id,title,icon,color,redirect}) {
 
 const navigation = useNavigation();
 
 
-   const redirect =()=>{
-     navigation.navigate(screen)
-   }
+
 
 
     return(

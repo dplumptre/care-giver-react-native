@@ -163,7 +163,7 @@ const SignupScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <PrimaryButton onPress={onSubmit}>Sign up</PrimaryButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Sign up</PrimaryButton>
       </View>
 
       <View style={styles.buttonContainer}>

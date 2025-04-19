@@ -14,11 +14,17 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import SignupScreen from './screens/auth/SignupScreen';
 import SigninScreen from './screens/auth/SigninScreen';
 import AuthContextProvider,{authContext} from './store/auth-context';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import LogoutScreen from './screens/auth/LogoutScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator } from 'react-native';
 import IconButton from './components/buttons/IconButton';
+import PatientScreen from './screens/patient/PatientScreen';
+import AddPatientScreen from './screens/patient/AddPatientScreen';
+import EditPatientScreen from './screens/patient/EditPatientScreen';
+import ExerciseDashboardScreen from './screens/exercices/ExerciseDashboardScreen';
+import ExerciseListScreen from './screens/exercices/ExerciseListScreen';
+import ExerciseVideoDetailScreen from './screens/exercices/ExerciseVideoDetailScreen';
 
 
 
@@ -31,6 +37,14 @@ const Drawer = createDrawerNavigator();
 
 
 function MainDashboardNavigator({ navigation }) {
+
+
+
+
+
+
+
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -105,6 +119,86 @@ function LearningHubNavigator({ navigation }) {
 }
 
 
+function ExerciseNavigator({ navigation }) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#FFF' },
+        headerTintColor: '#522E2E',
+        headerShown: true,
+      }}
+    >
+      <Stack.Screen
+        name="ExerciseDasboard"
+        component={ExerciseDashboardScreen}
+        options={{
+          title: 'Rehabilitation Exercise',
+          headerLeft: () => (
+            <IconButton
+            name="menu"
+            color="#522E2E"
+            size={23}
+            drawer
+          />
+          
+          )
+        }}
+      />
+        <Stack.Screen
+        name="ExerciseList"
+        component={ExerciseListScreen}
+        options={{ title: 'Exercises' }}
+      />
+        <Stack.Screen
+        name="ExerciseVideoDetail"
+        component={ExerciseVideoDetailScreen}
+        options={{ title: 'Exercises' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function PatientNavigator({ navigation }) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#FFF' },
+        headerTintColor: '#522E2E',
+        headerShown: true,
+      }}
+    >
+      <Stack.Screen
+        name="PatientDasboard"
+        component={PatientScreen}
+        options={{
+          title: 'Patients',
+          headerLeft: () => (
+            <IconButton
+            name="menu"
+            color="#522E2E"
+            size={23}
+            drawer
+          />
+          
+          )
+        }}
+      />
+        <Stack.Screen
+        name="AddPatient"
+        component={AddPatientScreen}
+        options={{ title: 'Add Patient' }}
+      />
+      <Stack.Screen
+        name="EditPatient"
+        component={EditPatientScreen}
+        options={{ title: 'Edit Patient' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+
+
 
 const DrawerNavigator=()=>{
   return <Drawer.Navigator     
@@ -139,6 +233,27 @@ const DrawerNavigator=()=>{
           )
         }}
     />
+
+
+<Drawer.Screen name='ExerciseModule' component={ExerciseNavigator} 
+        options={{
+          title:"Rehabilitation Exercise",
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="bicycle" size={size} color={color} />
+          )
+        }}
+    />
+
+<Drawer.Screen name='PatientModule' component={PatientNavigator} 
+        options={{
+          title:"Patients",
+         
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="person" size={size} color={color} />
+          )
+        }}
+    />
+
        <Drawer.Screen name='Logout' component={LogoutScreen} 
         options={{
           title:"Logout",
@@ -194,7 +309,6 @@ function Root(){
         if(storedToken){
             setAuthToken(storedToken);
         }
-
         setIsTrying(false)
    }
    fetchToken();
@@ -208,8 +322,6 @@ if (isTryingLogin) {
     </View>
   );
 }
-
-
 return <Navigation />;
 }
 
@@ -218,14 +330,6 @@ return <Navigation />;
 
 
 export default function App() {
-
-
-
-
-
-
-
-
 
   return (
     <AuthContextProvider>
