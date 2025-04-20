@@ -7,7 +7,7 @@ import { authContext } from "../store/auth-context";
 import axios from "axios";
 import { urlA } from "../constant/konst";
 import { useFocusEffect } from "@react-navigation/native";
-
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 const DashboardScreen = ({navigation}) => {
 
 
@@ -97,14 +97,14 @@ const DashboardScreen = ({navigation}) => {
                     <View style={styles.statusItem}>
                         <IconButton name="school" size={15} color="#FDE6D0" /> 
                         <Text style={styles.statusTextWhite}> Learning Hub:</Text>
-                        <Text style={styles.statusTextDark}> {result.reward ? `${result.reward} Badge` : "Loading..."} </Text>
+                        <Text style={styles.statusTextYellow}> {result.reward ? `${result.reward} Badge` : "Loading..."} </Text>
                     </View>
 
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
-                        <IconButton name="medal-outline" size={15} color="#FFD700" />
+                        <FontAwesome5 name="star" size={14} color="#FFD700"  />
                         <Text style={styles.statusTextWhite}> Earned: </Text>
-                        <Text style={styles.statusTextDark}> 50 </Text>
+                        <Text style={styles.statusTextYellow}> 50 </Text>
                     </View>
                 </View>
                 <View style={styles.statusTop}>
@@ -112,14 +112,14 @@ const DashboardScreen = ({navigation}) => {
                     <View style={styles.statusItem}>
                         <IconButton name="home" size={15} color="#FDE6D0" /> 
                         <Text style={styles.statusTextWhite}> Home Setup:</Text>
-                        <Text style={styles.statusTextDark}>  Uncompleted</Text>
+                        <Text style={styles.statusTextYellow}>  Uncompleted</Text>
                     </View>
 
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
                         <IconButton name="medal-outline" size={15} color="#FFD700" />
                         <Text style={styles.statusTextWhite}> Earned: </Text>
-                        <Text style={styles.statusTextDark}> 50 </Text>
+                        <Text style={styles.statusTextYellow}> 50 </Text>
                     </View>
                 </View>
 
@@ -164,7 +164,8 @@ export default DashboardScreen;
 const styles = StyleSheet.create({
     greetings: { flex: 0.50 ,  margin:12},
     hello: {
-        color: '#522E2E'
+        color: '#522E2E',
+        fontSize: 17
     },
     tagline: {
         color: '#522E2E',
@@ -212,7 +213,12 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         padding: 16,
-    },
+    },   
+    statusTextYellow: {
+        color: '#FFFACD',
+        fontWeight: 'bold',
+        fontSize: 14,
+    }
 
     
 
