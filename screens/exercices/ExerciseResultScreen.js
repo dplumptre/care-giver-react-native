@@ -72,6 +72,10 @@ const ExerciseResultScreen = ({ route, navigation }) => {
             >
                 Back to Dashboard
             </PrimaryButton>
+          
+
+
+            
         </View>
     );
 };
@@ -82,8 +86,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#F5F5F5',
-        alignItems: 'center',
+        backgroundColor: '#F5F5F5'
     },
     title: {
         fontSize: 28,
@@ -117,6 +120,7 @@ const styles = StyleSheet.create({
     },
     starsContainer: {
         flexDirection: 'row',
+        flexWrap: 'wrap', 
         marginBottom: 16,
     },
     streakText: {
@@ -134,8 +138,6 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#522E2E',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
+     
     },
 });

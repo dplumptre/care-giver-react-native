@@ -11,8 +11,8 @@ const ExerciseDashboardScreen = ({ navigation }) => {
     const [summary, setSummary] = useState({
         patientStars: 0,
         carerStars: 0,
-        patientStreak: "No streaks yet.",
-        carerStreak: "No streaks yet.",
+        patientStreaks: [],
+        carerStreaks: [],
     });
 
     const authCtx = useContext(authContext);
@@ -26,15 +26,15 @@ const ExerciseDashboardScreen = ({ navigation }) => {
 
                 const data = response.data.data;
 
-                // Extract the first streak for patient and carer
-                const firstPatientStreak = Object.values(data.patientStreaks)[0] || "No streaks yet.";
-                const firstCarerStreak = Object.values(data.carerStreaks)[0] || "No streaks yet.";
+                // Extract streaks for patient and carer
+                const patientStreaks = Object.values(data.patientStreaks).slice(0, 3); // Max 3 streaks
+                const carerStreaks = Object.values(data.carerStreaks).slice(0, 3); // Max 3 streaks
 
                 setSummary({
                     patientStars: data.patientStars,
                     carerStars: data.carerStars,
-                    patientStreak: firstPatientStreak,
-                    carerStreak: firstCarerStreak,
+                    patientStreaks: patientStreaks,
+                    carerStreaks: carerStreaks,
                 });
             } catch (error) {
                 console.error("Error fetching summary:", error);
@@ -63,41 +63,69 @@ const ExerciseDashboardScreen = ({ navigation }) => {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.statuses}>
-                <View style={styles.statusTop}>
-                    <View style={styles.statusItem}>
-                        <FontAwesome5 name="user-injured" size={16} color="#FDE6D0" style={{ marginRight: 4 }} />
-                        <Text style={styles.statusTextWhite}>Earned:</Text>
-                        <Text style={styles.statusTextYellow}>{summary.patientStars}</Text>
-                        <FontAwesome5 name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
-                    </View>
-
-                    <View style={styles.statusItem}>
-                        <FontAwesome5 name="user-injured" size={16} color="#FDE6D0" style={{ marginRight: 4 }} />
-                        <Text style={styles.statusTextWhite}>Streak:</Text>
-                        <Text style={styles.statusTextYellow}>{summary.patientStreak}</Text>
+                {/* Patient Section */}
+                <View style={styles.statusGroup}>
+                    <View style={styles.statusTop}>
+                        <View style={styles.statusItem}>
+                            <FontAwesome5 name="user-injured" size={16} color="#FDE6D0" style={{ marginRight: 4, paddingBottom:6 }} />
+                            <Text style={styles.statusTextWhite}>Earned:</Text>
+                            <Text style={styles.statusTextYellow}>{summary.patientStars}</Text>
+                            <FontAwesome5 name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
+                        </View>
+    
+                        <View style={styles.statusItem}>
+                            <FontAwesome5 name="user-injured" size={16} color="#FDE6D0"  style={{ marginLeft: 20,marginRight: 4, paddingBottom:4 }} />   
+                            <Text style={styles.statusTextYellow}>
+                                {summary.patientStreaks[0] || "No streaks yet."}
+                            </Text>
+                        </View>
                     </View>
                 </View>
-
-                <View style={styles.statusTop}>
-                    <View style={styles.statusItem}>
-                        <FontAwesome5 name="user-nurse" size={16} color="#FDE6D0" style={{ marginRight: 4 }} />
-                        <Text style={styles.statusTextWhite}>Earned:</Text>
-                        <Text style={styles.statusTextYellow}>{summary.carerStars}</Text>
-                        <FontAwesome5 name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
+    
+                {/* Carer Section */}
+                <View style={styles.statusGroup}>
+                    <View style={styles.statusTop}>
+                        <View style={styles.statusItem}>
+                            <FontAwesome5 name="user-nurse" size={16} color="#FDE6D0"  style={{ marginRight: 4, paddingBottom:6 }} />
+                            <Text style={styles.statusTextWhite}>Earned:</Text>
+                            <Text style={styles.statusTextYellow}>{summary.carerStars}</Text>
+                            <FontAwesome5 name="star" size={14} color="#FFD700" style={{ marginLeft: 4 }} />
+                        </View>
+    
+                        <View style={styles.statusItem}>
+                            <FontAwesome5 name="user-nurse" size={16} color="#FDE6D0" style={{ marginLeft: 20,marginRight: 4, paddingBottom:4 }} />
+                            <Text style={styles.statusTextYellow}>
+                                {summary.carerStreaks[0] || "No streaks yet."}
+                            </Text>
+                        </View>
                     </View>
-
-                    <View style={styles.statusItem}>
-                        <FontAwesome5 name="user-nurse" size={16} color="#FDE6D0" style={{ marginRight: 4 }} />
-                        <Text style={styles.statusTextWhite}>Streak:</Text>
-                        <Text style={styles.statusTextYellow}>{summary.carerStreak}</Text>
-                    </View>
+                </View>
+    
+                {/* Additional Streaks Section */}
+                <View style={styles.bottomStreaks}>
+                  
+                    {/* Additional Patient Streaks */}
+                    {summary.patientStreaks.slice(1).map((streak, index) => (
+                        <View key={index} style={styles.additionalStreak}>
+                            <FontAwesome5 name="user-injured" size={16} color="#FDE6D0"  style={{ marginRight: 4, paddingBottom:6 }} />
+                            <Text style={styles.statusTextYellow}>{streak}</Text>
+                        </View>
+                    ))}
+    
+                    {/* Additional Carer Streaks */}
+                    {summary.carerStreaks.slice(1).map((streak, index) => (
+                        <View key={index} style={styles.additionalStreak}>
+                            <FontAwesome5 name="user-nurse" size={16} color="#FDE6D0"  style={{ marginRight: 4, paddingBottom:6 }} />
+                            <Text style={styles.statusTextYellow}>{streak}</Text>
+                        </View>
+                    ))}
                 </View>
             </View>
-
+    
             <View style={styles.greetings}>
                 <Text style={styles.hello}>Select Role</Text>
             </View>
-
+    
             <View style={styles.segments}>
                 <FlatList
                     data={EXERCISE_SEGMENTS}
@@ -127,22 +155,48 @@ const styles = StyleSheet.create({
         fontSize: 23,
     },
     statuses: {
-        flex: 0.7,
+        flex: 1.7,
         backgroundColor: '#C57575',
         padding: 10,
         borderRadius: 6,
         margin: 12,
     },
+    statusGroup: {
+        marginBottom: 3, // Add spacing between patient and carer sections
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#FFF',
+        marginBottom: 8,
+    },
     statusTop: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         marginBottom: 8,
     },
     statusItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 5,
+
+    },
+    bottomStreaks: {
+        // marginTop: 16,
+        // paddingTop: 10,
+        // borderTopWidth: 1,
+        // borderTopColor: '#FFF',
+    },
+    additionalSectionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFF',
+        marginBottom: 8,
+    },
+    additionalStreak: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
     },
     statusTextWhite: {
         color: '#FFFFFF',

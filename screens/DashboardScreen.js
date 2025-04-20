@@ -164,7 +164,8 @@ export default DashboardScreen;
 const styles = StyleSheet.create({
     greetings: { flex: 0.50 ,  margin:12},
     hello: {
-        color: '#522E2E'
+        color: '#522E2E',
+        fontSize: 17
     },
     tagline: {
         color: '#522E2E',
