@@ -7,6 +7,7 @@ import { urlA } from "../../constant/konst";
 import { authContext } from "../../store/auth-context";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import { useFocusEffect } from "@react-navigation/native";
+import { VideoType } from "../../util/enum";
 
 
 
@@ -26,7 +27,7 @@ const LearningDashboardScreen =({navigation})=>{
 
         setIsLoading(true);
         const getVideos =()=>{
-            axios.get(`${urlA}/videos`,{
+            axios.get(`${urlA}/videos?type=${VideoType.LEARNING_HUB}`,{
                 headers:{
                     Authorization: 'Bearer '+ authCtx.token
                 }

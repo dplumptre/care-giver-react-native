@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import axios from "axios";
@@ -171,7 +171,10 @@ const LearningVideoQuestionsScreen = ({ navigation }) => {
             <PrimaryButton
                 onPress={onSubmit}
                 disabled={!allQuestionsAnswered}
-                style={[!allQuestionsAnswered ? styles.blurredButton : null]}
+                style={[
+                    styles.Button,
+                    !allQuestionsAnswered && styles.blurredButton
+                  ]}
             >
                 Submit Answers
             </PrimaryButton>
@@ -214,6 +217,9 @@ const styles = StyleSheet.create({
     blurredButton: {
         opacity: 0.5, // Apply blur effect by reducing opacity
     },
+    Button: {
+        backgroundColor: '#522E2E'
+    }
 });
 
 export default LearningVideoQuestionsScreen;
