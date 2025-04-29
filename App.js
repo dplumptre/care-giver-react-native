@@ -26,6 +26,9 @@ import ExerciseDashboardScreen from './screens/exercices/ExerciseDashboardScreen
 import ExerciseListScreen from './screens/exercices/ExerciseListScreen';
 import ExerciseVideoDetailScreen from './screens/exercices/ExerciseVideoDetailScreen';
 import ExerciseResultScreen from './screens/exercices/ExerciseResultScreen';
+import HomeSetupDashboardScreen from './screens/home-setup/HomeSetupDashboardScreen';
+import HomeSetupCheckListScreen from './screens/home-setup/HomeSetupCheckListScreen';
+import HomeSetupResultScreen from './screens/home-setup/HomeSetupResultScreen';
 
 
 
@@ -216,6 +219,57 @@ function PatientNavigator({ navigation }) {
 
 
 
+function HomeSetupNavigator({ navigation }) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#FFF' },
+        headerTintColor: '#522E2E',
+        headerShown: true,
+      }}
+    >
+      <Stack.Screen
+        name="HomeSetupDasboard"
+        component={HomeSetupDashboardScreen}
+        options={{
+          title: 'Personalised Home Setup',
+          headerLeft: () => (
+            <IconButton
+            name="menu"
+            color="#522E2E"
+            size={23}
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
+          />
+          
+          )
+        }}
+      />
+        <Stack.Screen
+        name="HomeSetupCheckList"
+        component={HomeSetupCheckListScreen}
+        options={{ title: 'Home Setup Check List' }}
+      />
+      <Stack.Screen
+        name="HomeSetupResult"
+        component={HomeSetupResultScreen}
+        options={{ title: 'Result' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
 const DrawerNavigator=()=>{
   return <Drawer.Navigator     
   screenOptions={{
@@ -256,6 +310,15 @@ const DrawerNavigator=()=>{
           title:"Rehabilitation Exercise",
           drawerIcon:({color,size}) =>(
             <Ionicons name="bicycle" size={size} color={color} />
+          )
+        }}
+    />
+
+<Drawer.Screen name='HomeSetupModule' component={HomeSetupNavigator} 
+        options={{
+          title:"Personalised Home Setup",
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="home" size={size} color={color} />
           )
         }}
     />
