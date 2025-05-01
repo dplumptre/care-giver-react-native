@@ -29,6 +29,8 @@ import ExerciseResultScreen from './screens/exercices/ExerciseResultScreen';
 import HomeSetupDashboardScreen from './screens/home-setup/HomeSetupDashboardScreen';
 import HomeSetupCheckListScreen from './screens/home-setup/HomeSetupCheckListScreen';
 import HomeSetupResultScreen from './screens/home-setup/HomeSetupResultScreen';
+import MedicationDashboardScreen from './screens/medication/MedicationDashboardScreen';
+import AddMedicationScreen from './screens/medication/AddMedicationScreen';
 
 
 
@@ -219,6 +221,51 @@ function PatientNavigator({ navigation }) {
 
 
 
+function MedicationNavigator({ navigation }) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#FFF' },
+        headerTintColor: '#522E2E',
+        headerShown: true,
+      }}
+    >
+      <Stack.Screen
+        name="MedicationDasboard"
+        component={MedicationDashboardScreen}
+        options={{
+          title: 'Medication Tracker',
+          headerLeft: () => (
+            <IconButton
+            name="menu"
+            color="#522E2E"
+            size={23}
+            onPressHandler={
+              () => {navigation.toggleDrawer()
+            }}
+          />
+          
+          )
+        }}
+      />
+        <Stack.Screen
+        name="AddMedication"
+        component={AddMedicationScreen}
+        options={{ title: 'Add Medication' }}
+      />
+     {/*  <Stack.Screen
+        name="EditPatient"
+        component={EditPatientScreen}
+        options={{ title: 'Edit Patient' }}
+      /> */}
+    </Stack.Navigator>
+  );
+}
+
+
+
+
+
 function HomeSetupNavigator({ navigation }) {
   return (
     <Stack.Navigator
@@ -294,6 +341,16 @@ const DrawerNavigator=()=>{
           )
         }}
     />
+
+<Drawer.Screen name='HomeSetupModule' component={HomeSetupNavigator} 
+        options={{
+          title:"Personalised Home Setup",
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="home" size={size} color={color} />
+          )
+        }}
+    />
+
    <Drawer.Screen name='LearningHub' component={LearningHubNavigator} 
         options={{
           title:"Learning Hub",
@@ -304,7 +361,14 @@ const DrawerNavigator=()=>{
         }}
     />
 
-
+<Drawer.Screen name='MedicationModule' component={MedicationNavigator} 
+        options={{
+          title:"Medication Tracker",
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="medical" size={size} color={color} />
+          )
+        }}
+    />
 <Drawer.Screen name='ExerciseModule' component={ExerciseNavigator} 
         options={{
           title:"Rehabilitation Exercise",
@@ -314,14 +378,7 @@ const DrawerNavigator=()=>{
         }}
     />
 
-<Drawer.Screen name='HomeSetupModule' component={HomeSetupNavigator} 
-        options={{
-          title:"Personalised Home Setup",
-          drawerIcon:({color,size}) =>(
-            <Ionicons name="home" size={size} color={color} />
-          )
-        }}
-    />
+
 
 <Drawer.Screen name='PatientModule' component={PatientNavigator} 
         options={{
