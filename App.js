@@ -32,6 +32,7 @@ import HomeSetupResultScreen from './screens/home-setup/HomeSetupResultScreen';
 import MedicationDashboardScreen from './screens/medication/MedicationDashboardScreen';
 import AddMedicationScreen from './screens/medication/AddMedicationScreen';
 import EditMedicationScreen from './screens/medication/EditMedicationScreen';
+import TestNotification from './components/TestNotification';
 
 
 
@@ -390,7 +391,6 @@ const DrawerNavigator=()=>{
           )
         }}
     />
-
        <Drawer.Screen name='Logout' component={LogoutScreen} 
         options={{
           title:"Logout",
@@ -399,6 +399,16 @@ const DrawerNavigator=()=>{
           )
         }}
     />
+
+<Drawer.Screen name='NotificationModule' component={TestNotification} 
+        options={{
+          title:"Test Notification",
+          drawerIcon:({color,size}) =>(
+            <Ionicons name="notifications" size={size} color={color} />
+          )
+        }}
+    />
+
   </Drawer.Navigator>
 }
 
