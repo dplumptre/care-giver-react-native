@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -14,12 +14,11 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
+import { urlA } from '../../constant/konst';
+import { authContext } from '../../store/auth-context';
+import axios from 'axios';
+import LoadingOverlay from '../../components/ui/LoadingOverlay';
 
-const demoPatients = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-    { id: '3', name: 'Alice Johnson' },
-];
 
 const AddMedicationScreen = ({ navigation }) => {
     const [selectedPatient, setSelectedPatient] = useState('');
@@ -29,11 +28,43 @@ const AddMedicationScreen = ({ navigation }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [patientList,setPatientList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const authCtx = useContext(authContext);
     const [validationErrors, setValidationErrors] = useState({
         patient: false,
         drugName: false,
         dosage: false,
     });
+
+
+
+
+    useEffect(()=>{
+        console.log(`${urlA}/patients`)
+    setIsLoading(true);
+    const getPatients =()=>{
+        axios.get(`${urlA}/patients`,{
+            headers:{
+                Authorization: 'Bearer '+ authCtx.token
+            }
+        }).then(response => {
+            const data = response.data.data;
+            console.log(response.data);
+            console.log(data);
+            setPatientList(data);
+        }).catch((error)=>{
+            console.log(error);
+        }).finally(()=>{
+            setIsLoading(false);
+        })
+    } 
+    getPatients();
+    },[]);
+
+
+
+
 
     const handleDateChange = (event, date) => {
         if (event?.type === 'set' && date) {
@@ -91,12 +122,12 @@ const AddMedicationScreen = ({ navigation }) => {
         setTimeCards((prev) => prev.filter((t) => t.isoDate !== time.isoDate));
     };
 
-    const handleSave = () => {
+    const handleSave = async() => {
         const payload = {
             patientId: selectedPatient,
             drugName,
             dosage,
-            times: timeCards.map((t) => t.isoDate),
+            times: timeCards.map((t) => ({ time: t.isoDate }))
         };
 
         let isValid = true;
@@ -121,9 +152,46 @@ const AddMedicationScreen = ({ navigation }) => {
 
         if (!isValid) return;
 
-        console.log('Payload:', payload);
-        Alert.alert('Success', 'Medication saved successfully!');
-        navigation.goBack();
+
+        const myRequest ={
+            drugName:payload.drugName,
+            dosage:payload.dosage,
+            patientId:payload.patientId,
+            dosageTimes:payload.times
+        }
+        console.log('Payload:', myRequest);
+        setIsLoading(true);
+  
+            try {
+                const resp = await axios.post(
+                    `${urlA}/medications`,
+                    myRequest,
+                    {
+                        headers: {
+                            Authorization: "Bearer " + authCtx.token,
+                        },
+                    }
+                );
+                const data = resp.data;
+                console.log("medication created:", data);
+                Alert.alert(
+                  "Medication Created",
+                  "You have successfully added a medication",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => navigation.navigate("MedicationDasboard")
+                    }
+                  ]
+                );
+            } catch (error) {
+                console.error("Failed to create medication:", error.message);
+            } finally {
+                setIsLoading(false);
+            }
+
+       
+        
     };
 
     const renderTimeCard = ({ item }) => (
@@ -134,6 +202,11 @@ const AddMedicationScreen = ({ navigation }) => {
             </TouchableOpacity>
         </View>
     );
+
+
+    if (isLoading) {
+        return <LoadingOverlay message="Loading..." />;
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -147,7 +220,7 @@ const AddMedicationScreen = ({ navigation }) => {
                         mode="dropdown"
                     >
                         <Picker.Item label="-- Select Patient --" value="" />
-                        {demoPatients.map((patient) => (
+                        {patientList.map((patient) => (
                             <Picker.Item key={patient.id} label={patient.name} value={patient.id} />
                         ))}
                     </Picker>

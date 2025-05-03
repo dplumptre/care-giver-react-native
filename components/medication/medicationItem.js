@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 
-const MedicationItem = ({id,name,onView}) => {
+const MedicationItem = ({item,onView}) => {
 
   
   return (<Pressable 
@@ -15,13 +15,13 @@ const MedicationItem = ({id,name,onView}) => {
       styles.listItemContainer,
       Platform.OS === 'ios' && pressed ? styles.pressedItem : null
     ]}
-    onPress={onView.bind(this, id)}
+    onPress={onView.bind(this, item)}
   >
     <Text style={styles.text1}>
     <FontAwesome5 name="syringe" size={20} color="#C57575" style={styles.iconLeft} />
     </Text>
     <View style={styles.textWrapper}>
-      <Text style={styles.text2}>{name}</Text>
+      <Text style={styles.text2}>{item.drugName}</Text>
     </View>
     <Text style={styles.text3}>
       <IconButton name="chevron-forward-sharp" size={24} color="#DDD" />

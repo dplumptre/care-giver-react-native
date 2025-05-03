@@ -31,6 +31,7 @@ import HomeSetupCheckListScreen from './screens/home-setup/HomeSetupCheckListScr
 import HomeSetupResultScreen from './screens/home-setup/HomeSetupResultScreen';
 import MedicationDashboardScreen from './screens/medication/MedicationDashboardScreen';
 import AddMedicationScreen from './screens/medication/AddMedicationScreen';
+import EditMedicationScreen from './screens/medication/EditMedicationScreen';
 
 
 
@@ -253,11 +254,11 @@ function MedicationNavigator({ navigation }) {
         component={AddMedicationScreen}
         options={{ title: 'Add Medication' }}
       />
-     {/*  <Stack.Screen
-        name="EditPatient"
-        component={EditPatientScreen}
-        options={{ title: 'Edit Patient' }}
-      /> */}
+      <Stack.Screen
+        name="EditMedication"
+        component={EditMedicationScreen}
+        options={{ title: 'Edit Medication' }}
+      />
     </Stack.Navigator>
   );
 }

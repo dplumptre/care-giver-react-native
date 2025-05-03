@@ -1,33 +1,17 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity,Platform, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MedicationItem from '../../components/medication/medicationItem';
 import IconButton from '../../components/buttons/IconButton';
+import { urlA } from '../../constant/konst';
+import { authContext } from '../../store/auth-context';
+import axios from 'axios';
 
-const demoPatients = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-    { id: '3', name: 'Alice Johnson' },
-];
 
-const demoMedications = {
-    '1': [
-        { id: '1', name: 'Paracetamol' },
-        { id: '2', name: 'Ibuprofen' },
-        { id: '3', name: 'Amoxicillin' },
-    ],
-    '2': [
-        { id: '1', name: 'Metformin' },
-        { id: '2', name: 'Atorvastatin' },
-    ],
-    '3': [
-        { id: '1', name: 'Aspirin' },
-        { id: '2', name: 'Losartan' },
-        { id: '3', name: 'Omeprazole' },
-    ],
-};
+
+
 
 
 
@@ -35,6 +19,32 @@ const demoMedications = {
 const MedicationDashboardScreen = ({ navigation }) => {
     const [selectedPatient, setSelectedPatient] = useState('');
     const [medications, setMedications] = useState([]);
+    const [patientList,setPatientList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const authCtx = useContext(authContext);
+
+
+    useLayoutEffect(()=>{
+    console.log(`${urlA}/patients`)
+setIsLoading(true);
+const getPatients =()=>{
+    axios.get(`${urlA}/patients`,{
+        headers:{
+            Authorization: 'Bearer '+ authCtx.token
+        }
+    }).then(response => {
+        const data = response.data.data;
+        console.log(response.data);
+        console.log(data);
+        setPatientList(data);
+    }).catch((error)=>{
+        console.log(error);
+    }).finally(()=>{
+        setIsLoading(false);
+    })
+} 
+getPatients();
+},[authCtx.token]);
 
 
 
@@ -52,17 +62,80 @@ const MedicationDashboardScreen = ({ navigation }) => {
 
 
 
-    const onViewHandler = (id) => {
-        Alert.alert(id);
-    }
 
-    const handlePatientSelect = (patientId) => {
-        setSelectedPatient(patientId);
-        setMedications(demoMedications[patientId] || []);
+    const onViewHandler = (item) => {
+        const dosageTimes = item.dosageTimes
+          .map((dt) => {
+            const datetime = new Date(dt.time);
+            const formattedDate = datetime.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }); // e.g., May 2, 2025
+            const formattedTime = datetime.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            }); // e.g., 08:30 AM
+            return `• ${formattedDate} at ${formattedTime}`;
+          })
+          .join('\n');
+      
+        const message = `Dosage: ${item.dosage}\n\n${dosageTimes}`;
+      
+        Alert.alert(
+          'Details',
+          message,
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Edit',
+              onPress: () =>
+                navigation.navigate('EditMedication', {
+                  medicationId: item.id,
+                  name: item.drugName,
+                }),
+            },
+          ],
+          { cancelable: true }
+        );
+      };
+      
+      
+      
+
+    const handlePatientSelect = async(patientId) => {
+       setSelectedPatient(patientId);
+
+       if(patientId !== ''){
+        try {
+            const resp = await axios.get(`${urlA}/medications/patients/${patientId}`, {
+              headers: {
+                Authorization: "Bearer " + authCtx.token,
+              },
+            });
+            const response = resp.data.data;
+            setMedications(response);
+            console.log(response);
+          } catch (error) {
+            Alert.alert("Error", "Failed to fetch patient data.");
+            console.error(error);
+          } finally {
+            setIsLoading(false);
+          }
+       }
+
+
+
+
+
+
     };
 
     const renderMedicationItem = ({ item }) => (
-        <MedicationItem id={item.id} name={item.name} onView={onViewHandler}/>
+        <MedicationItem item={item} onView={onViewHandler}/>
     );
 
     return (
@@ -90,22 +163,11 @@ const MedicationDashboardScreen = ({ navigation }) => {
                     mode="dropdown"
                 >
                     <Picker.Item label="-- Select Patient --" value="" />
-                    {demoPatients.map((patient) => (
+                    {patientList.map((patient) => (
                         <Picker.Item key={patient.id} label={patient.name} value={patient.id} />
                     ))}
                 </Picker>
             </View>
-
-
-
-     
-
-
-
-
-
-
-
 
 
             {/* Medication List */}
