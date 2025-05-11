@@ -17,12 +17,9 @@ import { urlA } from '../../constant/konst';
 import { authContext } from '../../store/auth-context';
 import axios from 'axios';
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
+import IconButton from '../../components/buttons/IconButton';
+import { scheduleMedicationNotifications } from '../../util/notificationHelper';
 
-const demoPatients = [
-  { id: '1', name: 'John Doe' },
-  { id: '2', name: 'Jane Smith' },
-  { id: '3', name: 'Alice Johnson' },
-];
 
 const EditMedicationScreen = ({ route, navigation }) => {
   const { name, medicationId } = route.params;
@@ -38,12 +35,56 @@ const EditMedicationScreen = ({ route, navigation }) => {
   const authCtx = useContext(authContext);
 
 
-
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Edit " + name
     });
   }, [navigation, name]);
+
+
+
+  function headerButtonPressHandler() {
+    Alert.alert(
+      "Delete Medication",
+      "Are you sure you want to delete this medication?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            console.log("Medication deleted");
+            try {
+              await axios.delete(`${urlA}/medications/${medicationId}`, {
+                headers: {
+                  Authorization: "Bearer " + authCtx.token,
+                },
+              });
+              Alert.alert("Deleted", "Medication deleted successfully.", [
+                { text: "OK", onPress: () => navigation.navigate("MedicationDashboard") },
+              ]);
+            } catch (error) {
+              console.error("Delete failed:", error.message);
+              Alert.alert("Error", "Failed to delete Medication.");
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  }
+
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return <IconButton onPressHandler={headerButtonPressHandler} name="trash" size={24} color="#522E2E" />
+      }
+    })
+  }, [navigation, headerButtonPressHandler])
 
 
   useEffect(() => {
@@ -56,8 +97,8 @@ const EditMedicationScreen = ({ route, navigation }) => {
         }
       }).then(response => {
         const data = response.data.data;
-        console.log(response.data);
-        console.log(data);
+        // console.log(response.data);
+        //console.log(data);
         setPatientList(data);
       }).catch((error) => {
         console.log(error);
@@ -67,6 +108,7 @@ const EditMedicationScreen = ({ route, navigation }) => {
     }
     getPatients();
   }, []);
+
 
 
 
@@ -86,8 +128,8 @@ const EditMedicationScreen = ({ route, navigation }) => {
           })
           .then((response) => {
             const data = response.data.data;
-            console.log("aaaaaa"+ data.drugName+ " " + data.dosage);
-            console.log(data);
+            console.log(data.drugName + " " + data.dosage);
+            //  console.log(data);
 
             // Set states using the real response
             setDrugName(data.drugName);
@@ -95,19 +137,27 @@ const EditMedicationScreen = ({ route, navigation }) => {
             setSelectedPatient(data.patient?.id); // check for optional chaining
 
 
-            setTimeCards(
-              data.dosageTimes.map((dt) => ({
-                isoDate: dt.time,
-                formattedDate: new Date(dt.time).toLocaleString('en-GB', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false,
-                }).replace(',', ''),
-              }))
-            );
+
+            if (data.dosageTimes.length > 0) {
+              setTimeCards(
+                data.dosageTimes.map((dt) => ({
+                  isoDate: dt.time,
+                  formattedDate: new Date(dt.time).toLocaleString('en-GB', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  }).replace(',', ''),
+                }))
+              );
+            }
+
+
+
+
+
           })
           .catch((error) => {
             console.log(error);
@@ -144,7 +194,12 @@ const EditMedicationScreen = ({ route, navigation }) => {
     setTimeCards((prev) => prev.filter((t) => t.isoDate !== time.isoDate));
   };
 
-  const handleSave = async() => {
+  const handleSave = async () => {
+
+
+    console.log("Selected Patient:", selectedPatient);
+
+
     if (!selectedPatient || !drugName || !dosage || timeCards.length === 0) {
       Alert.alert('Error', 'Please fill out all fields and add at least one time.');
       return;
@@ -158,41 +213,102 @@ const EditMedicationScreen = ({ route, navigation }) => {
     };
 
 
-    const myRequest ={
-      drugName:payload.drugName,
-      dosage:payload.dosage,
-      patientId:payload.patientId,
-      dosageTimes:payload.times
-  }
-  console.log('Payload:', myRequest);
-  setIsLoading(true);
+    const myRequest = {
+      drugName: payload.drugName,
+      dosage: payload.dosage,
+      patientId: payload.patientId,
+      dosageTimes: payload.times
+    }
+    console.log('Payload:', myRequest);
+    setIsLoading(true);
+
+
+
+
+
+    if (!selectedPatient) {
+      console.log('Patient ID is undefined or null');
+      return;
+    }
+
+
+
+
+    try {
+      const resp = await axios.get(`${urlA}/patients/${payload.patientId}`, {
+        headers: {
+          Authorization: "Bearer " + authCtx.token,
+        },
+      });
+      const patient = resp.data.data;
+      console.log("Patient Name: from db", patient.name);
+
+
+
       try {
-          const resp = await axios.put(
-              `${urlA}/medications/${medicationId}`,
-              myRequest,
-              {
-                  headers: {
-                      Authorization: "Bearer " + authCtx.token,
-                  },
-              }
-          );
-          const data = resp.data;
-          console.log("medication created:", data);
-          Alert.alert(
-            "Medication Updated",
-            "You have successfully Updated a medication",
-            [
-              {
-                text: "OK",
-                onPress: () => navigation.navigate("MedicationDasboard")
-              }
-            ]
-          );
+        const resp = await axios.put(
+          `${urlA}/medications/${medicationId}`,
+          myRequest,
+          {
+            headers: {
+              Authorization: "Bearer " + authCtx.token,
+            },
+          }
+        );
+        const data = resp.data;
+        console.log("medication created:", data);
+
+
+        console.log("Raw timeCards data:", timeCards);
+
+        // Format the time cards for notifications
+        const formattedTimeCards = timeCards.map((t) => ({
+          isoDate: t.isoDate,
+        }));
+        console.log("Scheduling notifications for:", formattedTimeCards);
+        console.log('drugName:', payload.drugName);
+        console.log('patientId:', payload.patientId);
+        console.log('formattedTimeCards:', formattedTimeCards);
+        try {
+          // Schedule notifications
+          await scheduleMedicationNotifications(payload.drugName, formattedTimeCards, payload.patientId, patient.name);
+        } catch (err) {
+          console.error("Failed to schedule notification:", err.message);
+        }
+        Alert.alert(
+          "Medication Updated",
+          "You have successfully Updated a medication",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("MedicationDashboard")
+            }
+          ]
+        );
       } catch (error) {
-          console.error("Failed to update medication:", error.message);
+        console.error("Failed to update medication:", error.message);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       };
+
+
+
+
+
+
+
+
+
+
+
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch patient data.");
+      console.error(error);
+    }
+
+
+
+
   };
 
   const renderTimeCard = ({ item }) => (
