@@ -18,6 +18,7 @@ import { urlA } from '../../constant/konst';
 import { authContext } from '../../store/auth-context';
 import axios from 'axios';
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
+import { registerNotificationActions, scheduleMedicationNotifications } from '../../util/notificationHelper';
 
 
 const AddMedicationScreen = ({ navigation }) => {
@@ -28,7 +29,7 @@ const AddMedicationScreen = ({ navigation }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [patientList,setPatientList] = useState([]);
+    const [patientList, setPatientList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const authCtx = useContext(authContext);
     const [validationErrors, setValidationErrors] = useState({
@@ -39,28 +40,32 @@ const AddMedicationScreen = ({ navigation }) => {
 
 
 
+    useEffect(() => {
+        registerNotificationActions();
+    }, []);
 
-    useEffect(()=>{
+
+    useEffect(() => {
         console.log(`${urlA}/patients`)
-    setIsLoading(true);
-    const getPatients =()=>{
-        axios.get(`${urlA}/patients`,{
-            headers:{
-                Authorization: 'Bearer '+ authCtx.token
-            }
-        }).then(response => {
-            const data = response.data.data;
-            console.log(response.data);
-            console.log(data);
-            setPatientList(data);
-        }).catch((error)=>{
-            console.log(error);
-        }).finally(()=>{
-            setIsLoading(false);
-        })
-    } 
-    getPatients();
-    },[]);
+        setIsLoading(true);
+        const getPatients = () => {
+            axios.get(`${urlA}/patients`, {
+                headers: {
+                    Authorization: 'Bearer ' + authCtx.token
+                }
+            }).then(response => {
+                const data = response.data.data;
+                console.log(response.data);
+                console.log(data);
+                setPatientList(data);
+            }).catch((error) => {
+                console.log(error);
+            }).finally(() => {
+                setIsLoading(false);
+            })
+        }
+        getPatients();
+    }, []);
 
 
 
@@ -122,7 +127,7 @@ const AddMedicationScreen = ({ navigation }) => {
         setTimeCards((prev) => prev.filter((t) => t.isoDate !== time.isoDate));
     };
 
-    const handleSave = async() => {
+    const handleSave = async () => {
         const payload = {
             patientId: selectedPatient,
             drugName,
@@ -153,45 +158,81 @@ const AddMedicationScreen = ({ navigation }) => {
         if (!isValid) return;
 
 
-        const myRequest ={
-            drugName:payload.drugName,
-            dosage:payload.dosage,
-            patientId:payload.patientId,
-            dosageTimes:payload.times
+        const myRequest = {
+            drugName: payload.drugName,
+            dosage: payload.dosage,
+            patientId: payload.patientId,
+            dosageTimes: payload.times
         }
         console.log('Payload:', myRequest);
         setIsLoading(true);
-  
+
+
+
+
+        if (!payload.patientId) {
+            console.log('Patient ID is undefined or null');
+            return;
+        }
+
+
+
+
+        try {
+            const resp = await axios.get(`${urlA}/patients/${payload.patientId}`, {
+                headers: {
+                    Authorization: "Bearer " + authCtx.token,
+                },
+            });
+            const patient = resp.data.data;
+            console.log("Patient Name: from db", patient.name);
+
+
+
+
             try {
-                const resp = await axios.post(
-                    `${urlA}/medications`,
-                    myRequest,
-                    {
-                        headers: {
-                            Authorization: "Bearer " + authCtx.token,
-                        },
-                    }
-                );
+                const resp = await axios.post(`${urlA}/medications`, myRequest, {
+                    headers: { Authorization: "Bearer " + authCtx.token },
+                });
+
                 const data = resp.data;
                 console.log("medication created:", data);
-                Alert.alert(
-                  "Medication Created",
-                  "You have successfully added a medication",
-                  [
-                    {
-                      text: "OK",
-                      onPress: () => navigation.navigate("MedicationDasboard")
+
+                if (data.success) {
+                    console.log("start schedule notifications");
+
+                    // Log the time cards right before formatting
+                    console.log("Raw timeCards data:", timeCards);
+
+                    // Format the time cards for notifications
+                    const formattedTimeCards = timeCards.map((t) => ({
+                        isoDate: t.isoDate,
+                    }));
+                    console.log("Scheduling notifications for:", formattedTimeCards);
+
+                    try {
+                        // Schedule notifications
+                        await scheduleMedicationNotifications(payload.drugName, formattedTimeCards, payload.patientId, patient.name);
+                    } catch (err) {
+                        console.error("Failed to schedule notification:", err.message);
                     }
-                  ]
-                );
+                }
+
+                Alert.alert("Medication Created", "You have successfully added a medication", [
+                    { text: "OK", onPress: () => navigation.navigate("MedicationDashboard") },
+                ]);
             } catch (error) {
                 console.error("Failed to create medication:", error.message);
             } finally {
                 setIsLoading(false);
             }
+        } catch (error) {
+            Alert.alert("Error", "Failed to fetch patient data.");
+            console.error(error);
+        }
 
-       
-        
+
+
     };
 
     const renderTimeCard = ({ item }) => (

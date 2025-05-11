@@ -12,3 +12,9 @@ export const AffectedSide = {
     PATIENT_EXERCISE_SUPPORT: "PATIENT_EXERCISE_SUPPORT",
     CARER_EXERCISE: "CARER_EXERCISE",
   }
+
+
+  export const MedicationActions = {
+    TAKE : "TAKE",
+    SKIP : "SKIP",
+  }

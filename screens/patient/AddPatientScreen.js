@@ -95,7 +95,7 @@ const AddPatientScreen = ({ navigation }) => {
                 [
                   {
                     text: "OK",
-                    onPress: () => navigation.navigate("PatientDasboard")
+                    onPress: () => navigation.navigate("PatientDashboard")
                   }
                 ]
               );

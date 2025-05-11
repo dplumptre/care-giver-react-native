@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import DashboardScreen from './screens/DashboardScreen';
 import ResetScreen from './screens/auth/ResetScreen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -33,8 +33,11 @@ import MedicationDashboardScreen from './screens/medication/MedicationDashboardS
 import AddMedicationScreen from './screens/medication/AddMedicationScreen';
 import EditMedicationScreen from './screens/medication/EditMedicationScreen';
 import TestNotification from './components/TestNotification';
-
-
+import { registerNotificationActions } from './util/notificationHelper';
+import * as Notifications from 'expo-notifications';
+import { MedicationActions } from './util/enum';
+import axios from 'axios';
+import { urlA } from './constant/konst';
 
 
 const Stack = createNativeStackNavigator();
@@ -141,7 +144,7 @@ function ExerciseNavigator({ navigation }) {
       }}
     >
       <Stack.Screen
-        name="ExerciseDasboard"
+        name="ExerciseDashboard"
         component={ExerciseDashboardScreen}
         options={{
           title: 'Rehabilitation Exercise',
@@ -189,7 +192,7 @@ function PatientNavigator({ navigation }) {
       }}
     >
       <Stack.Screen
-        name="PatientDasboard"
+        name="PatientDashboard"
         component={PatientScreen}
         options={{
           title: 'Patients',
@@ -233,7 +236,7 @@ function MedicationNavigator({ navigation }) {
       }}
     >
       <Stack.Screen
-        name="MedicationDasboard"
+        name="MedicationDashboard"
         component={MedicationDashboardScreen}
         options={{
           title: 'Medication Tracker',
@@ -278,7 +281,7 @@ function HomeSetupNavigator({ navigation }) {
       }}
     >
       <Stack.Screen
-        name="HomeSetupDasboard"
+        name="HomeSetupDashboard"
         component={HomeSetupDashboardScreen}
         options={{
           title: 'Personalised Home Setup',
@@ -391,14 +394,19 @@ const DrawerNavigator=()=>{
           )
         }}
     />
-       <Drawer.Screen name='Logout' component={LogoutScreen} 
-        options={{
-          title:"Logout",
-          drawerIcon:({color,size}) =>(
-            <Ionicons name="exit" size={size} color={color} />
-          )
-        }}
-    />
+    
+
+<Drawer.Screen
+  name="Logout"
+  component={LogoutScreen}
+  options={{
+    title: 'Logout',
+    drawerIcon: ({ color, size }) => (
+      <Ionicons name="log-out" size={size} color={color} />
+    ),
+  }}
+/>
+
 
 <Drawer.Screen name='NotificationModule' component={TestNotification} 
         options={{
@@ -445,31 +453,31 @@ function Navigation() {
 
 
 
-function Root(){
-  const [isTryingLogin,setIsTrying] = useState(true)
+function Root() {
+  const [isTryingLogin, setIsTrying] = useState(true);
   const authCtx = useContext(authContext);
-  useEffect(()=>{
-        
+
+  useEffect(() => {
     async function fetchToken() {
-        const storedToken = await AsyncStorage.getItem('token');
+      const storedToken = await AsyncStorage.getItem('token');
 
-        if(storedToken){
-            setAuthToken(storedToken);
-        }
-        setIsTrying(false)
-   }
-   fetchToken();
-},[]);
+      if (storedToken) {
+        authCtx.setAuthToken(storedToken); 
+      }
+      setIsTrying(false);
+    }
+    fetchToken();
+  }, []);
 
+  if (isTryingLogin) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#C57575" />
+      </View>
+    );
+  }
 
-if (isTryingLogin) {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#C57575" />
-    </View>
-  );
-}
-return <Navigation />;
+  return <Navigation />;
 }
 
 
@@ -477,6 +485,75 @@ return <Navigation />;
 
 
 export default function App() {
+
+
+  const authCtx = useContext(authContext);
+
+  useEffect(() => {
+    // Register notification actions
+    registerNotificationActions();
+
+
+    // Add listener for notification responses
+    const subscription = Notifications.addNotificationResponseReceivedListener(async (response) => {
+      const action = response.actionIdentifier;
+      const data = response.notification.request.content.data;
+
+      console.log('Action:', action);
+      const token = await AsyncStorage.getItem('token');
+
+      if (!token) {
+        console.error('Token not found. Unable to process notification action.');
+        return;
+      }
+
+      if (action === MedicationActions.TAKE) {
+        console.log('Medication marked as taken', data);
+      } else if (action === MedicationActions.SKIP) {
+        console.log('Medication marked as skipped', data);
+        Alert.alert("Medication marked as skipped", "You have successfully skipped this medication.");
+
+      } else {
+        console.error("payload:", payload);
+        console.log('Notification tapped without action button', data);
+        return;
+      }
+
+
+      payload = {
+        action: action,
+        scheduledFor: data.isoDate,
+        patientId: data.patientId,
+      };
+
+      try {
+        const resp = await axios.post(
+          `${urlA}/medications/add-medication-log`,
+          payload,
+          {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        const result = resp.data;
+        console.log("Notification Log created:", result);
+        Alert.alert("Log Created", "You have successfully logged this medication.");
+      } catch (error) {
+        Alert.alert("Error", "Failed to log medication.");
+        console.log("Error creating notification log:", payload);
+        console.log("Failed to log medication:", error.response?.status, error.response?.data || error.message);
+      }
+
+    });
+
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
 
   return (
     <AuthContextProvider>
