@@ -25,7 +25,7 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
         });
         setPatients(response.data.data);
       } catch (error) {
-        console.error('Error fetching patients:', error);
+        console.log('Error fetching patients:', error);
       } finally {
         setIsLoading(false);
       }
@@ -41,7 +41,7 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
       });
       setSelectedPatientName(response.data.data.name); // Set the patient's name
     } catch (error) {
-      console.error('Error fetching patient details:', error.response?.data || error.message);
+      console.log('Error fetching patient details:', error.response?.data || error.message);
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +65,7 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
       });
       setChecklistItems(response.data.data);
     } catch (error) {
-      console.error('Error fetching task list:', error.response?.data || error.message);
+      console.log('Error fetching task list:', error.response?.data || error.message);
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +140,7 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
             setIsAllTasksCompleted(false);
         }
     } catch (error) {
-        console.error('Error updating task status:', error.response?.data || error.message);
+        console.log('Error updating task status:', error.response?.data || error.message);
 
         // Rollback UI update on error
         setTaskStatus((prev) => ({

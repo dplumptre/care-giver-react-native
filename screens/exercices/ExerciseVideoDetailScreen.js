@@ -34,7 +34,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
                 setVideo(data);
                 navigation.setOptions({ title: data.title });
             } catch (error) {
-                console.error("Error fetching video details:", error);
+                console.log("Error fetching video details:", error);
                 Alert.alert("Error", "Failed to load video details.", [{ text: "OK" }]);
             }
         }
@@ -52,7 +52,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
                 });
                 setPatientList(response.data.data);
             } catch (error) {
-                console.error("Error fetching patients:", error);
+                console.log("Error fetching patients:", error);
                 Alert.alert("Error", "Failed to load patients.", [{ text: "OK" }]);
             }
         }
@@ -80,13 +80,13 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
     };
 
     const handleWebViewError = (event) => {
-        console.error("WebView Error:", event.nativeEvent);
+        console.log("WebView Error:", event.nativeEvent);
         setWebViewError(event.nativeEvent);
         Alert.alert("WebView Error", event.nativeEvent.description, [{ text: "OK" }]);
     };
 
     const handleWebViewHttpError = (event) => {
-        console.error("WebView HTTP Error:", event.nativeEvent);
+        console.log("WebView HTTP Error:", event.nativeEvent);
         setWebViewError(event.nativeEvent);
         Alert.alert("HTTP Error", `Status: ${event.nativeEvent.statusCode}`, [{ text: "OK" }]);
     };
@@ -161,7 +161,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
 
 
                     } catch (error) {
-                        console.error("Error during submission or fetching result:", error?.response?.data || error);
+                        console.log("Error during submission or fetching result:", error?.response?.data || error);
                         Alert.alert("Error", "Failed to complete exercise or fetch result.", [{ text: "OK" }]);
                     }
                 },

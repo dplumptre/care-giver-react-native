@@ -33,7 +33,7 @@ const LearningVideoDetailScreen = ({navigation}) => {
             title: vee.title
         })
       } catch (error) {
-        console.error("Error fetching video details:", error);
+        console.log("Error fetching video details:", error);
         Alert.alert(
           "Error",
           "Failed to load video details. Please try again later.",
@@ -70,7 +70,7 @@ const LearningVideoDetailScreen = ({navigation}) => {
 
 
   const handleWebViewError = (event) => {
-    console.error("WebView Error:", event.nativeEvent);
+    console.log("WebView Error:", event.nativeEvent);
     setWebViewError(event.nativeEvent);
     Alert.alert(
       "WebView Error",
@@ -80,7 +80,7 @@ const LearningVideoDetailScreen = ({navigation}) => {
   };
 
   const handleWebViewHttpError = (event) => {
-    console.error("WebView HTTP Error:", event.nativeEvent);
+    console.log("WebView HTTP Error:", event.nativeEvent);
     setWebViewError(event.nativeEvent);
     Alert.alert(
       "WebView HTTP Error",

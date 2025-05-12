@@ -66,7 +66,7 @@ const EditMedicationScreen = ({ route, navigation }) => {
                 { text: "OK", onPress: () => navigation.navigate("MedicationDashboard") },
               ]);
             } catch (error) {
-              console.error("Delete failed:", error.message);
+              console.log("Delete failed:", error.message);
               Alert.alert("Error", "Failed to delete Medication.");
             } finally {
               setIsLoading(false);
@@ -273,7 +273,7 @@ const EditMedicationScreen = ({ route, navigation }) => {
           // Schedule notifications
           await scheduleMedicationNotifications(payload.drugName, formattedTimeCards, payload.patientId, patient.name);
         } catch (err) {
-          console.error("Failed to schedule notification:", err.message);
+          console.log("Failed to schedule notification:", err.message);
         }
         Alert.alert(
           "Medication Updated",
@@ -286,7 +286,7 @@ const EditMedicationScreen = ({ route, navigation }) => {
           ]
         );
       } catch (error) {
-        console.error("Failed to update medication:", error.message);
+        console.log("Failed to update medication:", error.message);
       } finally {
         setIsLoading(false);
       };
@@ -303,7 +303,7 @@ const EditMedicationScreen = ({ route, navigation }) => {
 
     } catch (error) {
       Alert.alert("Error", "Failed to fetch patient data.");
-      console.error(error);
+      console.log(error);
     }
 
 

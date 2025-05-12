@@ -214,7 +214,7 @@ const AddMedicationScreen = ({ navigation }) => {
                         // Schedule notifications
                         await scheduleMedicationNotifications(payload.drugName, formattedTimeCards, payload.patientId, patient.name);
                     } catch (err) {
-                        console.error("Failed to schedule notification:", err.message);
+                        console.log("Failed to schedule notification:", err.message);
                     }
                 }
 
@@ -222,13 +222,13 @@ const AddMedicationScreen = ({ navigation }) => {
                     { text: "OK", onPress: () => navigation.navigate("MedicationDashboard") },
                 ]);
             } catch (error) {
-                console.error("Failed to create medication:", error.message);
+                console.log("Failed to create medication:", error.message);
             } finally {
                 setIsLoading(false);
             }
         } catch (error) {
             Alert.alert("Error", "Failed to fetch patient data.");
-            console.error(error);
+            console.log(error);
         }
 
 

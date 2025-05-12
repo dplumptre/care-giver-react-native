@@ -28,7 +28,7 @@ const MedicationDashboardScreen = ({ navigation }) => {
                 });
                 setPatientList(response.data.data);
             } catch (error) {
-                console.error(error);
+                console.log(error);
             } finally {
                 setIsLoading(false);
             }
@@ -119,7 +119,7 @@ const MedicationDashboardScreen = ({ navigation }) => {
                 setRewards(rewardsResp.data.data); // Update rewards state
             } catch (error) {
                 Alert.alert('Error', 'Failed to fetch patient data.');
-                console.error(error);
+                console.log(error);
             } finally {
                 setIsLoading(false);
             }
@@ -134,13 +134,23 @@ const MedicationDashboardScreen = ({ navigation }) => {
         if (!rewards || !rewards.earnedBadges || rewards.earnedBadges.length === 0) {
             return <Text style={styles.noBadgesText}>No badges earned yet.</Text>;
         }
-
-        return rewards.earnedBadges.map((badge) => (
-            <View key={badge.id} style={styles.badgeContainer}>
-                <FontAwesome5 name={badge.icon} size={24} color="#fff" style={styles.badgeIcon} />
-                <Text style={styles.badgeText}>{badge.name}</Text>
+        const highestBadge = rewards.earnedBadges.reduce((prev, current) => {
+            if (current.streakDays <= rewards.currentStreak && current.streakDays > prev.streakDays) {
+                return current;
+            }
+            return prev;
+        }, { streakDays: 0 }); // Start with a default object with streakDays 0
+    
+        if (!highestBadge || !highestBadge.name) {
+            return <Text style={styles.noBadgesText}>No badges earned yet.</Text>;
+        }
+    
+        return (
+            <View style={styles.badgeContainer}>
+                <FontAwesome5 name={highestBadge.icon} size={24} color="#fff" style={styles.badgeIcon} />
+                <Text style={styles.badgeText}>{highestBadge.name}</Text>
             </View>
-        ));
+        );
     };
 
     return (
