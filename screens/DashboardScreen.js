@@ -103,22 +103,22 @@ const DashboardScreen = ({navigation}) => {
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
                         <FontAwesome5 name="star" size={14} color="#FFD700"  />
-                        <Text style={styles.statusTextWhite}> Earned: </Text>
-                        <Text style={styles.statusTextYellow}> 50 </Text>
+                        <Text style={styles.statusTextWhite}> Carer: </Text>
+                        <Text style={styles.statusTextYellow}> 10 </Text>
                     </View>
                 </View>
                 <View style={styles.statusTop}>
                     {/* Group Learning Hub and Bronze Level */}
                     <View style={styles.statusItem}>
                         <IconButton name="home" size={15} color="#FDE6D0" /> 
-                        <Text style={styles.statusTextWhite}> Home Setup:</Text>
-                        <Text style={styles.statusTextYellow}>  Uncompleted</Text>
+                        <Text style={styles.statusTextWhite}> Home Setup stars:</Text>
+                        <Text style={styles.statusTextYellow}>  50</Text>
                     </View>
 
                     {/* Group Medal Earned and Number */}
                     <View style={styles.statusItem}>
-                        <IconButton name="medal-outline" size={15} color="#FFD700" />
-                        <Text style={styles.statusTextWhite}> Earned: </Text>
+                    <FontAwesome5 name="star" size={14} color="#FFD700"  />
+                        <Text style={styles.statusTextWhite}> Patient: </Text>
                         <Text style={styles.statusTextYellow}> 50 </Text>
                     </View>
                 </View>
@@ -128,15 +128,16 @@ const DashboardScreen = ({navigation}) => {
                 <View style={styles.statusDown}>
 
                     <View style={styles.statusItemDown}>
-                        <IconButton name="videocam" size={15} color="#FDE6D0" />
-                        <Text style={styles.statusTextWhite}> Next Video: What is Stroke?</Text>
-                    </View>
-                 
-                    <View style={styles.statusItem}>
-                        <IconButton name="body" size={15} color="#FDE6D0"/>
-                        <Text style={styles.statusTextWhite}> Next Excercise</Text>
+                        <FontAwesome5 name="briefcase-medical" size={14} color="#FDE6D0"  />
+                        <Text style={styles.statusTextWhite}> Medical Adherance:</Text>
                     </View>
 
+                    <View style={styles.statusItem}>
+                        <FontAwesome5 name="award" size={14} color="#FFFACD"  />
+                        <Text style={styles.statusTextYellow}> Next Excercise </Text>
+                        <FontAwesome5 name="star" size={14} color="#FFD700"  />
+                        <Text style={styles.statusTextYellow}> 50 </Text>
+                    </View>
                 </View>
 
             </View>
@@ -197,9 +198,14 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
     },
 
+    statusItemIndent: {
+        flexDirection: 'row',
+        alignItems: 'flex-end', 
+    },
+
 
     statusTextWhite: {
-     
+        fontWeight: 'bold',
         paddingVertical: 5,
         color: '#FFFFFF',  
     },
@@ -218,6 +224,12 @@ const styles = StyleSheet.create({
         color: '#FFFACD',
         fontWeight: 'bold',
         fontSize: 14,
+    },
+    statusTextYellowAndIndent: {
+        color: '#FFFACD',
+        fontWeight: 'bold',
+        fontSize: 14,
+        paddingLeft: 10,
     }
 
     
