@@ -408,14 +408,7 @@ const DrawerNavigator=()=>{
 />
 
 
-<Drawer.Screen name='NotificationModule' component={TestNotification} 
-        options={{
-          title:"Test Notification",
-          drawerIcon:({color,size}) =>(
-            <Ionicons name="notifications" size={size} color={color} />
-          )
-        }}
-    />
+
 
   </Drawer.Navigator>
 }
