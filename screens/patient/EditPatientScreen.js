@@ -42,7 +42,7 @@ const EditPatientScreen = ({ navigation, route }) => {
         });
       } catch (error) {
         Alert.alert("Error", "Failed to fetch patient data.");
-        console.error(error);
+        console.log(error);
       } finally {
         setIsLoading(false);
       }
@@ -106,7 +106,7 @@ const EditPatientScreen = ({ navigation, route }) => {
         [{ text: "OK", onPress: () => navigation.navigate("PatientDasboard") }]
       );
     } catch (error) {
-      console.error("Failed to update patient:", error.message);
+      console.log("Failed to update patient:", error.message);
       Alert.alert("Error", "Update failed.");
     } finally {
       setIsLoading(false);
@@ -137,7 +137,7 @@ const EditPatientScreen = ({ navigation, route }) => {
         { text: "OK", onPress: () => navigation.navigate("PatientDasboard") },
       ]);
     } catch (error) {
-      console.error("Delete failed:", error.message);
+      console.log("Delete failed:", error.message);
       Alert.alert("Error", "Failed to delete patient.");
     } finally {
       setIsLoading(false);

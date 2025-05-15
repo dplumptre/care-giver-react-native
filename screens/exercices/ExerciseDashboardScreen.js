@@ -37,7 +37,7 @@ const ExerciseDashboardScreen = ({ navigation }) => {
                     carerStreaks: carerStreaks,
                 });
             } catch (error) {
-                console.error("Error fetching summary:", error);
+                console.log("Error fetching summary:", error);
             }
         }
 

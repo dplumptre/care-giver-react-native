@@ -25,7 +25,7 @@ const HomeSetupDashboardScreen = ({ navigation }) => {
                 setStars(data);
 
             } catch (error) {
-                console.error("Error fetching star:", error);
+                console.log("Error fetching star:", error);
             }
         }
 

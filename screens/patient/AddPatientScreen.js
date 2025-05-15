@@ -100,7 +100,7 @@ const AddPatientScreen = ({ navigation }) => {
                 ]
               );
           } catch (error) {
-              console.error("Failed to create patient:", error.message);
+              console.log("Failed to create patient:", error.message);
           } finally {
               setIsLoading(false);
           }

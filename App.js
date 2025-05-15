@@ -2,7 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import DashboardScreen from './screens/DashboardScreen';
 import ResetScreen from './screens/auth/ResetScreen';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -38,11 +37,12 @@ import * as Notifications from 'expo-notifications';
 import { MedicationActions } from './util/enum';
 import axios from 'axios';
 import { urlA } from './constant/konst';
-
+import { setupAxiosInterceptor } from './util/setupAxiosInterceptor';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
-
+const navigationRef = createNavigationContainerRef();
 
 
 
@@ -408,14 +408,7 @@ const DrawerNavigator=()=>{
 />
 
 
-<Drawer.Screen name='NotificationModule' component={TestNotification} 
-        options={{
-          title:"Test Notification",
-          drawerIcon:({color,size}) =>(
-            <Ionicons name="notifications" size={size} color={color} />
-          )
-        }}
-    />
+
 
   </Drawer.Navigator>
 }
@@ -445,7 +438,7 @@ function Navigation() {
   const authCtx = useContext(authContext);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {authCtx.isAuthenticated ? <DrawerNavigator /> : <AuthStack />}
     </NavigationContainer>
   );
@@ -488,6 +481,11 @@ export default function App() {
 
 
   const authCtx = useContext(authContext);
+
+  useEffect(() => {
+    // Set up the Axios interceptor
+    setupAxiosInterceptor(authCtx, navigationRef);
+  }, [authCtx]);
 
   useEffect(() => {
     // Register notification actions

@@ -32,7 +32,7 @@ const LearningVideoQuestionsScreen = ({ navigation }) => {
                 const res = response.data.data;
                 setQuestions(res);
             } catch (error) {
-                console.error("Error fetching questions", error);
+                console.log("Error fetching questions", error);
                 Alert.alert(
                     "Error",
                     "Failed to load video details. Please try again later.",
@@ -108,7 +108,7 @@ const LearningVideoQuestionsScreen = ({ navigation }) => {
                 // Navigate or show a result modal
                 // navigation.navigate("SuccessScreen", { score: result.scorePercentage });
             } catch (error) {
-                console.error("Failed to submit progress:", error.message);
+                console.log("Failed to submit progress:", error.message);
             } finally {
                 setIsLoading(false);
             }
