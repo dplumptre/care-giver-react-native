@@ -38,6 +38,14 @@ const AddMedicationScreen = ({ navigation }) => {
         dosage: false,
     });
 
+    const [errorMessages, setErrorMessages] = useState({
+        medicationName: '',
+        dosage: '',
+        frequency: '',
+        startDate: '',
+        endDate: '',
+        server: '',
+      });
 
 
     useEffect(() => {
@@ -136,20 +144,30 @@ const AddMedicationScreen = ({ navigation }) => {
         };
 
         let isValid = true;
-        let errors = { patient: false, drugName: false, dosage: false };
+        let errors = {
+            patient: '',
+            drugName: '',
+            dosage: '',
+            times: '',
+        };
 
         if (payload.patientId === '') {
-            errors.patient = true;
+            errors.patient = 'Please select a patient.';
             isValid = false;
         }
 
         if (drugName.length < 3) {
-            errors.drugName = true;
+            errors.drugName = 'Drug name must be at least 3 characters long.';
             isValid = false;
         }
 
-        if (dosage === '' || isNaN(dosage)) {
-            errors.dosage = true;
+        if (!dosage || isNaN(dosage) || dosage <= 0) {
+            errors.dosage = 'Please enter a valid dosage.';
+            isValid = false;
+        }
+
+        if (timeCards.length === 0) {
+            errors.times = 'Please add at least one time for the medication.';
             isValid = false;
         }
 
@@ -252,6 +270,7 @@ const AddMedicationScreen = ({ navigation }) => {
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View>
+                {/* Patient Picker */}
                 <Text style={[styles.inputLabel, validationErrors.patient && styles.errorLabel]}>Patient:</Text>
                 <View style={styles.pickerWrapper}>
                     <Picker
@@ -266,44 +285,49 @@ const AddMedicationScreen = ({ navigation }) => {
                         ))}
                     </Picker>
                 </View>
-
-                {!showDatePicker && !showTimePicker && (
-                    <>
-                        <Text style={[styles.inputLabel, validationErrors.drugName && styles.errorLabel]}>Drug Name:</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Drug Name"
-                            value={drugName}
-                            onChangeText={setDrugName}
-                        />
-
-                        <Text style={[styles.inputLabel, validationErrors.dosage && styles.errorLabel]}>Dosage:</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Dosage (numbers only)"
-                            value={dosage}
-                            onChangeText={setDosage}
-                            keyboardType="numeric"
-                        />
-
-                        <TouchableOpacity style={styles.addTimeButton} onPress={() => setShowDatePicker(true)}>
-                            <Ionicons name="add-circle" size={28} color="#C57575" />
-                            <Text style={styles.addTimeText}>Add Time</Text>
-                        </TouchableOpacity>
-
-                        {timeCards.length > 0 && (
-                            <FlatList
-                                data={timeCards}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={renderTimeCard}
-                                numColumns={1}
-                                contentContainerStyle={styles.timeCardContainer}
-                                scrollEnabled={false}
-                            />
-                        )}
-                    </>
+                {validationErrors.patient ? <Text style={styles.errorText}>{validationErrors.patient}</Text> : null}
+    
+                {/* Drug Name Input */}
+                <Text style={[styles.inputLabel, validationErrors.drugName && styles.errorLabel]}>Drug Name:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Drug Name"
+                    value={drugName}
+                    onChangeText={setDrugName}
+                />
+                {validationErrors.drugName ? <Text style={styles.errorText}>{validationErrors.drugName}</Text> : null}
+    
+                {/* Dosage Input */}
+                <Text style={[styles.inputLabel, validationErrors.dosage && styles.errorLabel]}>Dosage:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Dosage (numbers only)"
+                    value={dosage}
+                    onChangeText={setDosage}
+                    keyboardType="numeric"
+                />
+                {validationErrors.dosage ? <Text style={styles.errorText}>{validationErrors.dosage}</Text> : null}
+    
+                {/* Add Time Button */}
+                <TouchableOpacity style={styles.addTimeButton} onPress={() => setShowDatePicker(true)}>
+                    <Ionicons name="add-circle" size={28} color="#C57575" />
+                    <Text style={styles.addTimeText}>Add Time</Text>
+                </TouchableOpacity>
+                {validationErrors.times ? <Text style={styles.errorText}>{validationErrors.times}</Text> : null}
+    
+                {/* Time Cards */}
+                {timeCards.length > 0 && (
+                    <FlatList
+                        data={timeCards}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={renderTimeCard}
+                        numColumns={1}
+                        contentContainerStyle={styles.timeCardContainer}
+                        scrollEnabled={false}
+                    />
                 )}
-
+    
+                {/* Date Picker */}
                 {showDatePicker && (
                     <View>
                         <DateTimePicker
@@ -324,7 +348,8 @@ const AddMedicationScreen = ({ navigation }) => {
                         )}
                     </View>
                 )}
-
+    
+                {/* Time Picker */}
                 {showTimePicker && (
                     <View>
                         <DateTimePicker
@@ -340,7 +365,8 @@ const AddMedicationScreen = ({ navigation }) => {
                         )}
                     </View>
                 )}
-
+    
+                {/* Save Button */}
                 <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={handleSave}>
                     Save
                 </PrimaryButton>
@@ -437,5 +463,11 @@ const styles = StyleSheet.create({
     },
     iconButton: {
         padding: 10,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: -10,
+        marginBottom: 10,
     },
 });

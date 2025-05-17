@@ -19,6 +19,12 @@ const SigninScreen = ({ navigation }) => {
   });
 
 
+  const [errorMessages, setErrorMessages] = useState({
+    email: '',
+    password: '',
+    server: '',
+  });
+
   const [validationErrors, setValidationErrors] = useState({
     email: false,
     password: false,
@@ -45,16 +51,18 @@ const SigninScreen = ({ navigation }) => {
     let errors = { email: false, password: false };
 
     if (!email.includes('@')) {
-      errors.email = true;
+      errors.email = 'Please enter a valid email address.';
       isValid = false;
       setIsLoading(false);
     }
 
     if (password.length < 6) {
-      errors.password = true;
+      errors.password = 'Password must be at least 6 characters long.';
       isValid = false;
       setIsLoading(false);
     }
+
+    setErrorMessages(errors);
 
     setValidationErrors(errors);
     if (!isValid) {
@@ -71,7 +79,11 @@ const SigninScreen = ({ navigation }) => {
      authCtx.authenticate(response.data.data.jwtToken);
      Alert.alert("Login Successful!", response.data.message);
     }catch(error){
-      console.log("Signin error:", error.response?.data || error.message);
+      console.log('Signin error:', error.response?.data || error.message);
+      setErrorMessages((prev) => ({
+        ...prev,
+        server: error.response?.data?.message || 'An error occurred. Please try again.',
+      }));
       Alert.alert("Signin Failed!", error.response?.data?.message || "An error occurred.");
     }finally{
       setIsLoading(false);
@@ -98,13 +110,16 @@ const SigninScreen = ({ navigation }) => {
   }
   return (
     <View style={styles.container}>
+      {/* Email Input */}
       <Text style={[styles.inputLabel, validationErrors.email && styles.errorLabel]}>Email:</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => onChangeText('email', text)}
         value={payload.email}
       />
-
+      {errorMessages.email ? <Text style={styles.errorText}>{errorMessages.email}</Text> : null}
+  
+      {/* Password Input */}
       <Text style={[styles.inputLabel, validationErrors.password && styles.errorLabel]}>Password:</Text>
       <View style={styles.passwordInputContainer}>
         <TextInput
@@ -113,28 +128,31 @@ const SigninScreen = ({ navigation }) => {
           value={payload.password}
           secureTextEntry={!showPassword}
         />
-        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+        <TouchableOpacity onPress={() => setShowPassword((prev) => !prev)}>
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="gray" />
         </TouchableOpacity>
       </View>
-
-
-
-
-
+      {errorMessages.password ? <Text style={styles.errorText}>{errorMessages.password}</Text> : null}
+  
+      {/* Server Error Message */}
+      {errorMessages.server ? <Text style={styles.serverErrorText}>{errorMessages.server}</Text> : null}
+  
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <FlatButton position="right" onPress={onResetHandler}>
           Reset password
         </FlatButton>
       </View>
-
+  
       <View style={styles.buttonContainer}>
-        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Sign in</PrimaryButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>
+          Sign in
+        </PrimaryButton>
       </View>
-
+  
       <View style={styles.buttonContainer}>
         <FlatButton onPress={onFlipHandler}>
-          {isLogin ? "Haven’t registered? Create a new user" : "Already Registered? Log in"}
+          {isLogin ? 'Haven’t registered? Create a new user' : 'Already Registered? Log in'}
         </FlatButton>
       </View>
     </View>
@@ -193,6 +211,17 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     height: '100%',
+  },errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+  },
+  serverErrorText: {
+    color: 'red',
+    fontSize: 14,
+    textAlign: 'center',
+    marginVertical: 10,
   },
 });
 

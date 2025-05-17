@@ -23,9 +23,9 @@ const AddPatientScreen = ({ navigation }) => {
     affectedSide: '',
   });
   const [validationErrors, setValidationErrors] = useState({
-    fullName: false,
-    phone: false,
-    address: false,
+    fullName: '',
+    phone: '',
+    address: '',
     affectedSide: false,
   });
 
@@ -39,25 +39,25 @@ const AddPatientScreen = ({ navigation }) => {
     const { fullName, phone, address, affectedSide } = payload;
   
     let isValid = true;
-    let errors = { fullName: false, phone: false, address: false, affectedSide: false };
+    let errors = { fullName: '', phone: '', address: '', affectedSide: '' };
   
     // Full Name validation
-    if (fullName.length < 5) {
-      errors.fullName = true;
+    if (!fullName || fullName.trim().length < 5) {
+      errors.fullName = 'Full name must be at least 5 characters long.';
       isValid = false;
     }
   
     // phone validation
 
     if (!phone || isNaN(phone) || phone.trim() === '') {
-        errors.phone = true;
-        isValid = false;
-      }
+      errors.phone = 'Please enter a valid phone number.';
+      isValid = false;
+    }
   
 
     // Affected Side validation
-    if (affectedSide === '') {
-      errors.affectedSide = true;
+    if (!affectedSide) {
+      errors.affectedSide = 'Please select an affected side.';
       isValid = false;
     }
   
@@ -122,45 +122,54 @@ const AddPatientScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-<Text style={[styles.inputLabel, validationErrors.fullName && styles.errorLabel]}>Full Name</Text>
-<TextInput
-  style={styles.input}
-  onChangeText={(text) => onChangeText('fullName', text)}
-  value={payload.fullName}
-/>
-
-<Text style={[styles.inputLabel, validationErrors.phone && styles.errorLabel]}>phone:</Text>
-<TextInput
-  style={styles.input}
-  onChangeText={(text) => onChangeText('phone', text)}
-  value={payload.phone}
-/>
-
-<Text style={[styles.inputLabel, validationErrors.address && styles.errorLabel]}>address:</Text>
-<TextInput
-  style={styles.input}
-  onChangeText={(text) => onChangeText('address', text)}
-  value={payload.address}
-/>
-
-
-<Text style={[styles.inputLabel, validationErrors.affectedSide && styles.errorLabel]}>Affected Side:</Text>
+      {/* Full Name Input */}
+      <Text style={[styles.inputLabel, validationErrors.fullName && styles.errorLabel]}>Full Name</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => onChangeText('fullName', text)}
+        value={payload.fullName}
+      />
+      {validationErrors.fullName ? <Text style={styles.errorText}>{validationErrors.fullName}</Text> : null}
+  
+      {/* Phone Input */}
+      <Text style={[styles.inputLabel, validationErrors.phone && styles.errorLabel]}>Phone:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => onChangeText('phone', text)}
+        value={payload.phone}
+        keyboardType="numeric"
+      />
+      {validationErrors.phone ? <Text style={styles.errorText}>{validationErrors.phone}</Text> : null}
+  
+      {/* Address Input */}
+      <Text style={[styles.inputLabel, validationErrors.address && styles.errorLabel]}>Address:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => onChangeText('address', text)}
+        value={payload.address}
+      />
+      {validationErrors.address ? <Text style={styles.errorText}>{validationErrors.address}</Text> : null}
+  
+      {/* Affected Side Picker */}
+      <Text style={[styles.inputLabel, validationErrors.affectedSide && styles.errorLabel]}>Affected Side:</Text>
       <Picker
         selectedValue={payload.affectedSide}
         onValueChange={(text) => onChangeText('affectedSide', text)}
         style={[styles.picker, Platform.OS === 'ios' && styles.iosPicker]}
       >
-
-
         <Picker.Item label="Select affected side" value="" />
         <Picker.Item label="Right" value={AffectedSide.RIGHT_SIDE} />
-        <Picker.Item label="Left"  value={AffectedSide.LEFT_SIDE} />
+        <Picker.Item label="Left" value={AffectedSide.LEFT_SIDE} />
         <Picker.Item label="Both sides" value={AffectedSide.BOTH} />
-        <Picker.Item label="Others"  value={AffectedSide.OTHERS} />
+        <Picker.Item label="Others" value={AffectedSide.OTHERS} />
       </Picker>
-
+      {validationErrors.affectedSide ? <Text style={styles.errorText}>{validationErrors.affectedSide}</Text> : null}
+  
+      {/* Submit Button */}
       <View style={styles.buttonContainer}>
-        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Submit</PrimaryButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>
+          Submit
+        </PrimaryButton>
       </View>
     </View>
   );
@@ -199,8 +208,14 @@ const styles = StyleSheet.create({
     width: '100%',  
     marginBottom: 10,  
   }, 
-   errorLabel: {
-    color: 'red', 
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+  },
+  errorLabel: {
+    color: 'red',
   },
   iosPicker: {
     marginBottom: 100, 

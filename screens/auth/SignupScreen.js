@@ -27,6 +27,14 @@ const SignupScreen = ({ navigation }) => {
     password: false,
   });
 
+  const [errorMessages, setErrorMessages] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    password: '',
+    server: '',
+  });
+
   const onChangeText = (key, value) => {
     setPayload((prev) => ({
       ...prev, [key]: value
@@ -43,7 +51,7 @@ const SignupScreen = ({ navigation }) => {
 
     // Full Name validation
     if (fullName.length < 5) {
-      errors.fullName = true;
+      errors.fullName = 'Full name must be at least 5 characters long.';
       isValid = false;
       setIsLoading(false);
     }
@@ -51,36 +59,36 @@ const SignupScreen = ({ navigation }) => {
     // Username validation
     const usernameRegex = /^[A-Za-z0-9_]+$/;
     if (username.length < 5) {
-      errors.username = true;
+      errors.username = 'Username must be at least 5 characters long.';
       isValid = false;
       setIsLoading(false);
     } else if (!usernameRegex.test(username)) {
-      errors.username = true;
+      errors.username = 'Username can only contain letters, numbers, and underscores.';
       isValid = false;
       setIsLoading(false);
     }
 
     // Email validation
     if (!email.includes('@')) {
-      errors.email = true;
+      errors.email = 'Please enter a valid email address.';
       isValid = false;
       setIsLoading(false);
     }
 
     // Affected Side validation
     if (password === '') {
-      errors.password = true;
+      errors.password = 'Password must not be empty.';
       isValid = false;
       setIsLoading(false);
     }
 
     if (password.length < 5) {
-      errors.password = true;
+      errors.password = 'Password must be at least 6 characters long.';
       isValid = false;
       setIsLoading(false);
     }
 
-
+    setErrorMessages(errors);
     setValidationErrors(errors);
 
 
@@ -99,7 +107,11 @@ const SignupScreen = ({ navigation }) => {
 
       Alert.alert("Signup Successful!", response.data.message);
     } catch (error) {
-      console.log("Signup error:", error.response?.data || error.message);
+      console.log('Signup error:', error.response?.data || error.message);
+      setErrorMessages((prev) => ({
+        ...prev,
+        server: error.response?.data?.message || 'An error occurred. Please try again.',
+      }));
       Alert.alert("Signup Failed!", error.response?.data?.message || "An error occurred.");
     } finally {
       console.log("Stopping spinner");
@@ -124,33 +136,36 @@ const SignupScreen = ({ navigation }) => {
     return <LoadingOverlay message="Sending request..." />;
   }
   return (
-
-
     <View style={styles.container}>
-      <Text style={[styles.inputLabel, validationErrors.fullName && styles.errorLabel]}>Full Name</Text>
+      {/* Full Name Input */}
+      <Text style={[styles.inputLabel, errorMessages.fullName && styles.errorLabel]}>Full Name</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => onChangeText('fullName', text)}
         value={payload.fullName}
       />
-
-      <Text style={[styles.inputLabel, validationErrors.email && styles.errorLabel]}>Email:</Text>
+      {errorMessages.fullName ? <Text style={styles.errorText}>{errorMessages.fullName}</Text> : null}
+  
+      {/* Email Input */}
+      <Text style={[styles.inputLabel, errorMessages.email && styles.errorLabel]}>Email:</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => onChangeText('email', text)}
         value={payload.email}
       />
-
-      <Text style={[styles.inputLabel, validationErrors.username && styles.errorLabel]}>Username:</Text>
+      {errorMessages.email ? <Text style={styles.errorText}>{errorMessages.email}</Text> : null}
+  
+      {/* Username Input */}
+      <Text style={[styles.inputLabel, errorMessages.username && styles.errorLabel]}>Username:</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => onChangeText('username', text)}
         value={payload.username}
       />
-
-      <Text style={[styles.inputLabel, validationErrors.password && styles.errorLabel]}>
-        Password:
-      </Text>
+      {errorMessages.username ? <Text style={styles.errorText}>{errorMessages.username}</Text> : null}
+  
+      {/* Password Input */}
+      <Text style={[styles.inputLabel, errorMessages.password && styles.errorLabel]}>Password:</Text>
       <View style={styles.passwordInputContainer}>
         <TextInput
           style={styles.passwordInput}
@@ -158,22 +173,27 @@ const SignupScreen = ({ navigation }) => {
           value={payload.password}
           secureTextEntry={!showPassword}
         />
-        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+        <TouchableOpacity onPress={() => setShowPassword((prev) => !prev)}>
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="gray" />
         </TouchableOpacity>
       </View>
-
+      {errorMessages.password ? <Text style={styles.errorText}>{errorMessages.password}</Text> : null}
+  
+      {/* Server Error Message */}
+      {errorMessages.server ? <Text style={styles.serverErrorText}>{errorMessages.server}</Text> : null}
+  
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Sign up</PrimaryButton>
+        <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>
+          Sign up
+        </PrimaryButton>
       </View>
-
+  
       <View style={styles.buttonContainer}>
         <FlatButton onPress={onFlipHandler}>
           {isLogin ? 'Haven’t registered? Create a new user' : 'Already Registered? Log in'}
         </FlatButton>
       </View>
-
-      {isLoading && <LoadingOverlay message="Sending request..." />}
     </View>
   );
 };
@@ -237,6 +257,18 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     height: '100%',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+  },
+  serverErrorText: {
+    color: 'red',
+    fontSize: 14,
+    textAlign: 'center',
+    marginVertical: 10,
   },
 });
 

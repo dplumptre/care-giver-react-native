@@ -226,7 +226,7 @@ const ExerciseVideoDetailScreen = ({ route, navigation }) => {
 
             <View style={styles.buttonContainer}>
                 <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>
-                    Completed
+                    I've Completed this Exercise
                 </PrimaryButton>
             </View>
         </View>
