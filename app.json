@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "care-giver",
+    "owner": "dplumptre",
     "slug": "care-giver",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,13 +20,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }, 
-       "package": "com.overhallheuristic.caregiver" 
+      },
+      "package": "com.overhallheuristic.caregiver"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-    ]
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "10009457-9ac4-4556-8aa5-6f368f39dc9c"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/10009457-9ac4-4556-8aa5-6f368f39dc9c"
+    }
   }
 }
