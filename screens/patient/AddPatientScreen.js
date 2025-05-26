@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import FlatButton from "../../components/buttons/FlatButton";
 import { useContext, useState } from 'react';
@@ -9,12 +9,8 @@ import { urlA } from '../../constant/konst';
 import { AffectedSide } from '../../util/enum';
 
 const AddPatientScreen = ({ navigation }) => {
-  
-  const isLogin = false;
-
   const authCtx = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
-
 
   const [payload, setPayload] = useState({
     fullName: '',
@@ -47,14 +43,12 @@ const AddPatientScreen = ({ navigation }) => {
       isValid = false;
     }
   
-    // phone validation
-
+    // Phone validation
     if (!phone || isNaN(phone) || phone.trim() === '') {
       errors.phone = 'Please enter a valid phone number.';
       isValid = false;
     }
   
-
     // Affected Side validation
     if (!affectedSide) {
       errors.affectedSide = 'Please select an affected side.';
@@ -63,60 +57,44 @@ const AddPatientScreen = ({ navigation }) => {
   
     setValidationErrors(errors);
   
-  
     if (!isValid) {
       return;
     }
   
-
     console.log('Form Data Submitted:', payload);
-      setIsLoading(true);
+    setIsLoading(true);
 
-          try {
-              const resp = await axios.post(
-                  `${urlA}/patients`,
-                  {
-                    name:payload.fullName,
-                    phone:payload.phone,
-                    address:payload.address,
-                    affectedSide:payload.affectedSide,
-                  },
-                  {
-                      headers: {
-                          Authorization: "Bearer " + authCtx.token,
-                      },
-                  }
-              );
-              const data = resp.data;
-              console.log("patient created:", data);
-              Alert.alert(
-                "Patient Created",
-                "You have successfully created a patient",
-                [
-                  {
-                    text: "OK",
-                    onPress: () => navigation.navigate("PatientDashboard")
-                  }
-                ]
-              );
-          } catch (error) {
-              console.log("Failed to create patient:", error.message);
-          } finally {
-              setIsLoading(false);
+    try {
+      const resp = await axios.post(
+        `${urlA}/patients`,
+        {
+          name: payload.fullName,
+          phone: payload.phone,
+          address: payload.address,
+          affectedSide: payload.affectedSide,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + authCtx.token,
+          },
+        }
+      );
+      const data = resp.data;
+      console.log("patient created:", data);
+      Alert.alert(
+        "Patient Created",
+        "You have successfully created a patient",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("PatientDashboard")
           }
-      };
-     
-    
-    
-  
-
-  const onFlipHandler = () => {
-    if (!isLogin) {
-      console.log("yes");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Signin' }],
-      });
+        ]
+      );
+    } catch (error) {
+      console.log("Failed to create patient:", error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -171,6 +149,18 @@ const AddPatientScreen = ({ navigation }) => {
           Submit
         </PrimaryButton>
       </View>
+
+      {/* Link to Dashboard */}
+      <TouchableOpacity
+  onPress={() =>
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Dashboard' }],
+    })
+  }
+>
+  <Text style={styles.backToDashboardLink}>Back to Main Dashboard</Text>
+</TouchableOpacity>
     </View>
   );
 };
@@ -220,10 +210,13 @@ const styles = StyleSheet.create({
   iosPicker: {
     marginBottom: 100, 
   },
+  backToDashboardLink: {
+    fontSize: 16,
+    color: '#C57575',
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+    marginTop: 16,
+  },
 });
 
 export default AddPatientScreen;
-
-
-
-<Picker.Item label="Select affected side" value="" />

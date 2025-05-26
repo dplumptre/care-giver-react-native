@@ -1,51 +1,41 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Switch, Platform, Alert } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Switch, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { urlA } from '../../constant/konst';
 import { authContext } from '../../store/auth-context';
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeSetupCheckListScreen = ({ navigation }) => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState('');
-  const [selectedPatientName, setSelectedPatientName] = useState(''); // Store the selected patient's name
+  const [selectedPatientName, setSelectedPatientName] = useState('');
   const [taskStatus, setTaskStatus] = useState({});
   const [checklistItems, setChecklistItems] = useState([]);
-  const [isAllTasksCompleted, setIsAllTasksCompleted] = useState(false); // Track if all tasks are completed
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const [isAllTasksCompleted, setIsAllTasksCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const authCtx = useContext(authContext);
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(`${urlA}/patients`, {
-          headers: { Authorization: `Bearer ${authCtx.token}` },
-        });
-        setPatients(response.data.data);
-      } catch (error) {
-        console.log('Error fetching patients:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPatients();
-  }, [authCtx.token]);
-
-  const fetchPatientDetails = async (patientId) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`${urlA}/patients/${patientId}`, {
-        headers: { Authorization: `Bearer ${authCtx.token}` },
-      });
-      setSelectedPatientName(response.data.data.name); // Set the patient's name
-    } catch (error) {
-      console.log('Error fetching patient details:', error.response?.data || error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchPatients = async () => {
+        try {
+          setIsLoading(true);
+          const response = await axios.get(`${urlA}/patients`, {
+            headers: { Authorization: `Bearer ${authCtx.token}` },
+          });
+          setPatients(response.data.data);
+        } catch (error) {
+          console.log('Error fetching patients:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchPatients();
+    }, [authCtx.token])
+  );
 
   const onSelectedPatient = async (itemValue) => {
     if (!itemValue) {
@@ -56,7 +46,6 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
     }
 
     setSelectedPatient(itemValue);
-    await fetchPatientDetails(itemValue); // Fetch the selected patient's details
 
     try {
       setIsLoading(true);
@@ -71,87 +60,11 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
     }
   };
 
-  const handleToggle = async (taskId, currentStatus) => {
-    try {
-        // Optimistic UI update
-        const updatedTaskStatus = {
-            ...taskStatus[selectedPatient],
-            [taskId]: !currentStatus,
-        };
-
-        setTaskStatus((prev) => ({
-            ...prev,
-            [selectedPatient]: updatedTaskStatus,
-        }));
-
-        const status = !currentStatus;
-
-        await axios.put(
-            `${urlA}/home-setup/${selectedPatient}/update-task`,
-            {
-                taskId: taskId,
-                isCompleted: !currentStatus,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${authCtx.token}`,
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
-
-        console.log('Task status updated successfully');
-
-        // Fetch the latest task completion status from the server
-        const response = await axios.get(`${urlA}/home-setup/${selectedPatient}`, {
-            headers: { Authorization: `Bearer ${authCtx.token}` },
-        });
-
-        const latestChecklistItems = response.data.data;
-
-        // Check if all tasks are completed based on the latest data
-        const allTasksCompleted = latestChecklistItems.every((task) => task.isCompleted);
-
-        // Only show the alert if transitioning from incomplete to complete
-        if (allTasksCompleted && !isAllTasksCompleted) {
-            setIsAllTasksCompleted(true); // Update the state to reflect the completed status
-            Alert.alert(
-                'Congratulations!',
-                `You have completed the home setup for ${selectedPatientName}!`,
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            navigation.reset({
-                                index: 0,
-                                routes: [
-                                    {
-                                        name: 'HomeSetupResult',
-                                        params: { patientName: selectedPatientName },
-                                    },
-                                ],
-                            });
-                        },
-                    },
-                ]
-            );
-        } else if (!allTasksCompleted && isAllTasksCompleted) {
-            // Update the state to reflect the incomplete status
-            setIsAllTasksCompleted(false);
-        }
-    } catch (error) {
-        console.log('Error updating task status:', error.response?.data || error.message);
-
-        // Rollback UI update on error
-        setTaskStatus((prev) => ({
-            ...prev,
-            [selectedPatient]: {
-                ...prev[selectedPatient],
-                [taskId]: currentStatus,
-            },
-        }));
-    }
-};
+  const handleAddPatient = () => {
+    navigation.navigate('PatientModule', {
+      screen: 'AddPatient',
+    });
+  };
 
   const renderChecklistItem = ({ item }) => {
     const isTaskCompleted =
@@ -181,29 +94,40 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={selectedPatient}
-          onValueChange={(itemValue) => onSelectedPatient(itemValue)}
-          style={[styles.picker, Platform.OS === 'ios' && styles.iosPicker]}
-          mode="dropdown"
-        >
-          <Picker.Item label="-- Choose Patient --" value="" />
-          {patients.map((patient) => (
-            <Picker.Item key={patient.id} label={patient.name} value={patient.id} />
-          ))}
-        </Picker>
-      </View>
-
-      {selectedPatient ? (
-        <FlatList
-          data={checklistItems}
-          keyExtractor={(item) => item.id}
-          renderItem={renderChecklistItem}
-          contentContainerStyle={styles.listContainer}
-        />
+      {patients.length === 0 ? (
+        <View style={styles.noPatientsContainer}>
+          <Text style={styles.noPatientsText}>No patients found.</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('PatientModule', { screen: 'AddPatient' })}>
+  <Text style={styles.addPatientLink}>Click here to add a patient</Text>
+</TouchableOpacity>
+        </View>
       ) : (
-        <Text style={styles.infoText}>Please select a patient to view checklist</Text>
+        <>
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={selectedPatient}
+              onValueChange={(itemValue) => onSelectedPatient(itemValue)}
+              style={[styles.picker, Platform.OS === 'ios' && styles.iosPicker]}
+              mode="dropdown"
+            >
+              <Picker.Item label="-- Choose Patient --" value="" />
+              {patients.map((patient) => (
+                <Picker.Item key={patient.id} label={patient.name} value={patient.id} />
+              ))}
+            </Picker>
+          </View>
+
+          {selectedPatient ? (
+            <FlatList
+              data={checklistItems}
+              keyExtractor={(item) => item.id}
+              renderItem={renderChecklistItem}
+              contentContainerStyle={styles.listContainer}
+            />
+          ) : (
+            <Text style={styles.infoText}>Please select a patient to view checklist</Text>
+          )}
+        </>
       )}
     </View>
   );
@@ -216,6 +140,21 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  noPatientsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noPatientsText: {
+    fontSize: 16,
+    color: '#522E2E',
+    marginBottom: 8,
+  },
+  addPatientLink: {
+    fontSize: 16,
+    color: '#C57575',
+    textDecorationLine: 'underline',
   },
   pickerWrapper: {
     marginBottom: 16,

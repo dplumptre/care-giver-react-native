@@ -1,11 +1,12 @@
 import PatientItem from "../../components/PatientItem";
 import {  View, StyleSheet, FlatList } from "react-native";
-import {  useContext, useEffect, useLayoutEffect, useState } from "react";
+import {  useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import { urlA } from "../../constant/konst";
 import { authContext } from "../../store/auth-context";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import IconButton from "../../components/buttons/IconButton";
+import { useFocusEffect } from "@react-navigation/native";
 
 const PatientScreen =({navigation})=>{
 
@@ -28,7 +29,8 @@ const PatientScreen =({navigation})=>{
     },[navigation,headerButtonPressHandler])
 
 
-    useEffect(()=>{
+    useFocusEffect(
+      useCallback(() => {
             console.log("starts..."+authCtx.token)
             console.log(`${urlA}/patients`)
         setIsLoading(true);
@@ -49,7 +51,14 @@ const PatientScreen =({navigation})=>{
             })
         } 
         getPatients();
-    },[]);
+      }, [authCtx.token])
+    );
+
+
+
+
+
+
 
 
     function onViewHandler(id){
