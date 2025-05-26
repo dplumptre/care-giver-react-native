@@ -16,34 +16,35 @@ const LearningVideoQuestionsScreen = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-
-
         navigation.setOptions({
-            title: title
-        })
+          title: title,
+        });
+      
         setIsLoading(true);
         async function getQuestions() {
-            try {
-                const response = await axios.get(`${urlA}/questions/video/${videoId}`, {
-                    headers: {
-                        Authorization: "Bearer " + authCtx.token,
-                    },
-                });
-                const res = response.data.data;
-                setQuestions(res);
-            } catch (error) {
-                console.log("Error fetching questions", error);
-                Alert.alert(
-                    "Error",
-                    "Failed to load video details. Please try again later.",
-                    [{ text: "OK" }]
-                );
-            } finally {
-                setIsLoading(false);
-            }
+          try {
+            console.log("Fetching questions for video ID:", videoId);
+            const response = await axios.get(`${urlA}/questions/video/${videoId}`, {
+              headers: {
+                Authorization: "Bearer " + authCtx.token,
+              },
+            });
+            const res = response.data.data;
+            console.log("Questions fetched:", res);
+            setQuestions(res);
+          } catch (error) {
+            console.log("Error fetching questions:", error.response?.data || error.message);
+            Alert.alert(
+              "Error",
+              "Failed to load video details. Please try again later.",
+              [{ text: "OK" }]
+            );
+          } finally {
+            setIsLoading(false);
+          }
         }
         getQuestions();
-    }, [videoId, authCtx.token]);
+      }, [videoId, authCtx.token]);
 
 
 
