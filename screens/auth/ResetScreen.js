@@ -1,7 +1,10 @@
-import { View, Text, TextInput, StyleSheet, Platform } from "react-native";
+import { View, Text, TextInput, StyleSheet, Platform, Alert } from "react-native";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import FlatButton from "../../components/buttons/FlatButton";
 import { useState } from "react";
+import Logo from "../../components/Logo";
+import axios from "axios";
+import { urlA } from "../../constant/konst";
 
 const ResetScreen = ({ navigation }) => {
 
@@ -15,6 +18,10 @@ const ResetScreen = ({ navigation }) => {
     emailOrUsername: false,
   });
 
+  const [errorMessages, setErrorMessages] = useState({
+    emailOrUsername: ''
+  });
+
 
   const onChangeText = (key, value) => {
     setPayload((prev) => ({
@@ -24,26 +31,57 @@ const ResetScreen = ({ navigation }) => {
   };
 
   // Handle form submission
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const { emailOrUsername } = payload;
-
+  
+    // Reset errors
     let isValid = true;
-    let errors = { emailOrUsername: false };
-
-
-    if (emailOrUsername.trim() === '') {
-      errors.emailOrUsername = true;
+    let errors = { emailOrUsername: "" };
+  
+    // Validate input
+    if (emailOrUsername.trim() === "") {
+      errors.emailOrUsername = "Email address is required.";
+      isValid = false;
+    } else if (!emailOrUsername.includes("@")) {
+      errors.emailOrUsername = "Please enter a valid email address.";
       isValid = false;
     }
-
-    setValidationErrors(errors);
-
+  
+    setErrorMessages(errors);
+    setValidationErrors({ emailOrUsername: !!errors.emailOrUsername });
+  
     if (!isValid) {
-      return;
+      return; // Stop submission if validation fails
     }
-
- 
-    console.log("Form Data Submitted:", payload);
+  
+    try {
+      const resp = await axios.post(
+        `${urlA}/auth/forget-password`,
+        {
+          email: emailOrUsername,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = resp.data;
+      console.log("Code sent:", data);
+      Alert.alert(
+        "Code Sent",
+        "If the email is registered, a reset code has been sent to your email address.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("PasswordReset", { emailOrUsername }),
+          },
+        ]
+      );
+    } catch (error) {
+      console.log("Failed to send reset email:", error.message);
+      Alert.alert("Error", "Failed to send reset email. Please try again.");
+    }
   };
 
   // Navigate to sign-in screen
@@ -53,12 +91,16 @@ const ResetScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+          <Logo />
+
+  
       <Text style={[styles.inputLabel, validationErrors.emailOrUsername && styles.errorLabel]}>Email:</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => onChangeText('emailOrUsername', text)}
         value={payload.emailOrUsername}
       />
+      {errorMessages.emailOrUsername ? <Text style={styles.errorLabel}>{errorMessages.emailOrUsername}</Text> : null}  
 
       <View style={styles.buttonContainer}>
         <PrimaryButton style={{ backgroundColor: '#522E2E' }} onPress={onSubmit}>Reset Password</PrimaryButton>
@@ -101,6 +143,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 5,
+  },
+  errorLabel: {
+    color: 'red',
   },
 });
 
