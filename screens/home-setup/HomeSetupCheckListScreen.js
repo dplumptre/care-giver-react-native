@@ -44,8 +44,11 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
       setSelectedPatientName('');
       return;
     }
-
+    const selectedPatientObj = patients.find((patient) => patient.id === itemValue);
+    const patientName = selectedPatientObj ? selectedPatientObj.name : '';
+  
     setSelectedPatient(itemValue);
+    setSelectedPatientName(patientName); 
 
     try {
       setIsLoading(true);
@@ -65,6 +68,88 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
       screen: 'AddPatient',
     });
   };
+``
+  const handleToggle = async (taskId, currentStatus) => {
+    try {
+        // Optimistic UI update
+        const updatedTaskStatus = {
+            ...taskStatus[selectedPatient],
+            [taskId]: !currentStatus,
+        };
+
+        setTaskStatus((prev) => ({
+            ...prev,
+            [selectedPatient]: updatedTaskStatus,
+        }));
+
+        const status = !currentStatus;
+
+        await axios.put(
+            `${urlA}/home-setup/${selectedPatient}/update-task`,
+            {
+                taskId: taskId,
+                isCompleted: !currentStatus,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${authCtx.token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        console.log('Task status updated successfully');
+
+        // Fetch the latest task completion status from the server
+        const response = await axios.get(`${urlA}/home-setup/${selectedPatient}`, {
+            headers: { Authorization: `Bearer ${authCtx.token}` },
+        });
+
+        const latestChecklistItems = response.data.data;
+
+        // Check if all tasks are completed based on the latest data
+        const allTasksCompleted = latestChecklistItems.every((task) => task.isCompleted);
+
+        // Only show the alert if transitioning from incomplete to complete
+        if (allTasksCompleted && !isAllTasksCompleted) {
+            setIsAllTasksCompleted(true); // Update the state to reflect the completed status
+            Alert.alert(
+                'Congratulations!',
+                `You have completed the home setup for ${selectedPatientName}!`,
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            navigation.reset({
+                                index: 0,
+                                routes: [
+                                    {
+                                        name: 'HomeSetupResult',
+                                        params: { patientName: selectedPatientName },
+                                    },
+                                ],
+                            });
+                        },
+                    },
+                ]
+            );
+        } else if (!allTasksCompleted && isAllTasksCompleted) {
+            // Update the state to reflect the incomplete status
+            setIsAllTasksCompleted(false);
+        }
+    } catch (error) {
+        console.log('Error updating task status:', error.response?.data || error.message);
+
+        // Rollback UI update on error
+        setTaskStatus((prev) => ({
+            ...prev,
+            [selectedPatient]: {
+                ...prev[selectedPatient],
+                [taskId]: currentStatus,
+            },
+        }));
+    }
+};
 
   const renderChecklistItem = ({ item }) => {
     const isTaskCompleted =
@@ -116,6 +201,7 @@ const HomeSetupCheckListScreen = ({ navigation }) => {
               ))}
             </Picker>
           </View>
+
 
           {selectedPatient ? (
             <FlatList
