@@ -39,6 +39,8 @@ import axios from 'axios';
 import { urlA } from './constant/konst';
 import { setupAxiosInterceptor } from './util/setupAxiosInterceptor';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import CustomDrawerContent from './components/CustomDrawerContent';
+import PasswordResetScreen from './screens/auth/PasswordResetScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -322,9 +324,11 @@ function HomeSetupNavigator({ navigation }) {
 
 
 
-const DrawerNavigator=()=>{
-  return <Drawer.Navigator     
-  screenOptions={{
+const DrawerNavigator = () => {
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    screenOptions={{
     headerStyle:{backgroundColor:'#FFF'},
     headerTintColor:'#522E2E',
     drawerContentStyle:{backgroundColor:'#FFF'},
@@ -406,11 +410,8 @@ const DrawerNavigator=()=>{
     ),
   }}
 />
-
-
-
-
   </Drawer.Navigator>
+  );
 }
 
 
@@ -424,9 +425,10 @@ function AuthStack() {
         headerTintColor: '#522E2E',
       }}
     >
-      <Stack.Screen name="Signin" component={SigninScreen} options={{ title: 'Welcome back Caregiver' }} />
-      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: "Join Care Hub Today" }} />
-      <Stack.Screen name="Reset" component={ResetScreen} options={{ title: "Regain Access To Your Account" }} />
+      <Stack.Screen name="Signin" component={SigninScreen} options={{ title: 'Welcome back to CareNest' }} />
+      <Stack.Screen name="Signup" component={SignupScreen} options={{ title: "Join CareNest Today" }} />
+      <Stack.Screen name="Reset" component={ResetScreen} options={{ title: "Regain Access To Your CareNest Account" }} />
+      <Stack.Screen name="PasswordReset" component={PasswordResetScreen} options={{ title: "Create a new CareNest Account" }} />
     </Stack.Navigator>
   );
 }

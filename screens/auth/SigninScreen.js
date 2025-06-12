@@ -6,6 +6,7 @@ import { signinUser } from "../../util/auth";
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
 import { authContext } from '../../store/auth-context';
 import { Ionicons } from '@expo/vector-icons';
+import Logo from '../../components/Logo';
 
 const SigninScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -110,6 +111,9 @@ const SigninScreen = ({ navigation }) => {
   }
   return (
     <View style={styles.container}>
+
+    <Logo />
+      
       {/* Email Input */}
       <Text style={[styles.inputLabel, validationErrors.email && styles.errorLabel]}>Email:</Text>
       <TextInput

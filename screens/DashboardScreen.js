@@ -110,11 +110,15 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <View style={styles.mainContainer}>
-      {/* Greetings Section */}
-      <View style={styles.greetings}>
-        <Text style={styles.hello}>Hello {isLoadingUser ? "Loading..." : name},</Text>
-        <Text style={styles.tagline}>Ready to level up your care skills?</Text>
-      </View>
+    {/* Updated Greetings Section */}
+    <View style={styles.greetings}>
+      <Text style={styles.hello}>
+        Hi <Text style={styles.name}>{isLoadingUser ? "Loading..." : name}</Text>,
+      </Text>
+      <Text style={styles.tagline}>
+        Your CareNest journey begins here. Earn badges, build skills, and become a care hero.
+      </Text>
+    </View>
 
       {/* Statuses Section */}
       <View style={styles.statusesCard}>
@@ -208,15 +212,22 @@ const styles = StyleSheet.create({
   },
   greetings: {
     marginBottom: 16,
+    alignItems: "flex-start", // Align text to the left
   },
   hello: {
-    color: "#522E2E",
-    fontSize: 17,
+    color: "#522E2E", // Dark brown for primary text
+    fontSize: 22, // Slightly larger font for emphasis
+    fontWeight: "bold",
+  },
+  name: {
+    color: "#C57575", // Complementary red for the user's name
+    fontWeight: "bold",
   },
   tagline: {
-    color: "#522E2E",
-    fontSize: 21,
-    fontWeight: "bold",
+    color: "#522E2E", // Dark brown for secondary text
+    fontSize: 16,
+    marginTop: 5,
+    lineHeight: 22, // Add spacing for readability
   },
   statusesCard: {
     backgroundColor: "#C57575", // Card background color

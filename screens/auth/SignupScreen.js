@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { createUser } from '../../util/auth';
 import LoadingOverlay from '../../components/ui/LoadingOverlay';
+import Logo from '../../components/Logo';
 
 
 const SignupScreen = ({ navigation }) => {
@@ -106,6 +107,11 @@ const SignupScreen = ({ navigation }) => {
       console.log("Signup success:", response.data.message + " Please Signin");
 
       Alert.alert("Signup Successful!", response.data.message);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Signin' }],
+      });
+
     } catch (error) {
       console.log('Signup error:', error.response?.data || error.message);
       setErrorMessages((prev) => ({
@@ -137,6 +143,7 @@ const SignupScreen = ({ navigation }) => {
   }
   return (
     <View style={styles.container}>
+          <Logo />
       {/* Full Name Input */}
       <Text style={[styles.inputLabel, errorMessages.fullName && styles.errorLabel]}>Full Name</Text>
       <TextInput
