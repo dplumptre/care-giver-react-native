@@ -14,6 +14,7 @@ const MedicationDashboardScreen = ({ navigation }) => {
   const [medications, setMedications] = useState([]);
   const [patientList, setPatientList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [rewards, setRewards] = useState(null);
   const authCtx = useContext(authContext);
 
   // Fetch patients on screen focus
