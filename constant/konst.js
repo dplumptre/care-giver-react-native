@@ -10,7 +10,7 @@
  //export const urlA = 'http://10.0.2.2:2125/api';
 
 //  For physical device on same Wi-Fi (development)
- //export const urlA = 'http://192.168.1.110/api';
+// export const urlA = 'http://192.168.1.110/api';
 
  //  For iOS Simulator 
  export const urlA = 'http://localhost:2125/api';
