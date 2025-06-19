@@ -16,6 +16,7 @@ const MedicationItem = ({item,onView}) => {
       Platform.OS === 'ios' && pressed ? styles.pressedItem : null
     ]}
     onPress={onView.bind(this, item)}
+    onPress={() => onView(item)}
   >
     <Text style={styles.text1}>
     <FontAwesome5 name="syringe" size={20} color="#C57575" style={styles.iconLeft} />
